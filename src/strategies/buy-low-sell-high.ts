@@ -131,26 +131,26 @@ export abstract class BuyLowSellHigh extends VoFarmStrategy {
         const pnlENSLong = FinancialCalculator.getPNLOfPositionInPercent(this.longENSPosition)
         const pnlDOTLong = FinancialCalculator.getPNLOfPositionInPercent(this.longDOTPosition)
 
-        if (this.liquidityLevel > 10) {
-            if (pnlBTCLong < -20) {
+        if (this.liquidityLevel > 11) {
+            if (pnlBTCLong < -11) {
                 this.addInvestmentAdvice(Action.BUY, 0.001, 'BTCUSDT', `we enhance our BTCUSDT long position to fuck manipulators`)
             }
-            if (pnlETHLong < -20) {
+            if (pnlETHLong < -11) {
                 this.addInvestmentAdvice(Action.BUY, 0.01, 'ETHUSDT', `we enhance our ETHUSDT long position to fuck manipulators`)
             }
-            if (pnlENSLong < -20) {
+            if (pnlENSLong < -11) {
                 this.addInvestmentAdvice(Action.BUY, 0.1, 'ENSUSDT', `we enhance our ENSUSDT long position to fuck manipulators`)
             }
-            if (pnlSOLLong < -20) {
+            if (pnlSOLLong < -11) {
                 this.addInvestmentAdvice(Action.BUY, 1, 'SOLUSDT', `we enhance our SOLUSDT long position to fuck manipulators`)
             }
-            if (pnlADALong < -20) {
+            if (pnlADALong < -11) {
                 this.addInvestmentAdvice(Action.BUY, 1, 'ADAUSDT', `we enhance our ADAUSDT long position to fuck manipulators`)
             }
-            if (pnlDOTLong < -20) {
+            if (pnlDOTLong < -11) {
                 this.addInvestmentAdvice(Action.BUY, 1, 'DOTUSDT', `we enhance our DOTUSDT long position to fuck manipulators`)
             }
-            if (pnlARLong < -20) {
+            if (pnlARLong < -11) {
                 this.addInvestmentAdvice(Action.BUY, 1, 'ARUSDT', `we enhance our ARUSDT long position to fuck manipulators`)
             }
         }
@@ -158,7 +158,7 @@ export abstract class BuyLowSellHigh extends VoFarmStrategy {
         if (pnlBTCLong > 20 && this.longBTCPosition.data.size > 0.001) {
             this.addInvestmentAdvice(Action.REDUCELONG, 0.001, 'BTCUSDT', `we reduce our BTCUSDT long position to fuck manipulators`)
         }
-        if (pnlETHLong > 20 && this.longETHPosition.data.size > 1) {
+        if (pnlETHLong > 20 && this.longETHPosition.data.size > 11.11) {
             this.addInvestmentAdvice(Action.REDUCELONG, 0.01, 'ETHUSDT', `we reduce our ETHUSDT long position to fuck manipulators`)
         }
         if (pnlSOLLong > 20 && this.longSOLPosition.data.size > 1) {
