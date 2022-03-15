@@ -4,6 +4,7 @@ import { BybitConnector, IExchangeConnector, Registry } from "../deps.ts"
 import { IVFLogger } from "./interfaces/logger.ts"
 import { VFLogger } from "./utilities/logger.ts"
 import { MartingaleReloaded } from "./strategies/martingale-reloaded.ts";
+import { BuyLowSellHigh } from "./strategies/buy-low-sell-high.ts";
 
 const apiKey = Deno.args[0]
 const apiSecret = Deno.args[1]
@@ -18,6 +19,7 @@ const registryVoFarmStrategies = new Registry()
 const registryExchangeConnectors = new Registry()
 const registryLoggerServices = new Registry()
 
+registryVoFarmStrategies.register(BuyLowSellHigh)
 registryVoFarmStrategies.register(MartingaleReloaded)
 registryExchangeConnectors.register(BybitConnector)
 registryLoggerServices.register(VFLogger)
