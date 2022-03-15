@@ -84,10 +84,6 @@ export abstract class BuyLowSellHigh extends VoFarmStrategy {
 
         if (this.fundamentals.accountInfo.result.USDT.equity === 0) {
             throw new Error(`are you kidding me - how should I make money without an investment? :)`)
-        } else if (this.fundamentals.accountInfo.result.USDT.equity > 0 && this.liquidityLevel < 3) {
-
-            this.closeAll()
-
         } else if (this.longBTCPosition === undefined) {
             this.addInvestmentAdvice(Action.BUY, 0.001, 'BTCUSDT', `we open a BTCUSDT long position to play the game`)
         } else if (this.longETHPosition === undefined) {
