@@ -155,25 +155,25 @@ export abstract class BuyLowSellHigh extends VoFarmStrategy {
             }
         }
 
-        if (pnlBTCLong > 20 && this.longBTCPosition.data.size > 0.001) {
-            this.addInvestmentAdvice(Action.REDUCELONG, 0.001, 'BTCUSDT', `we reduce our BTCUSDT long position to fuck manipulators`)
-        }
         if (pnlETHLong > 20 && this.longETHPosition.data.size > 11.11) {
             this.addInvestmentAdvice(Action.REDUCELONG, 0.01, 'ETHUSDT', `we reduce our ETHUSDT long position to fuck manipulators`)
         }
-        if (pnlSOLLong > 20 && this.longSOLPosition.data.size > 1) {
+        // if (pnlENSLong > 20 && this.longENSPosition.data.size > 1111.1) { // we're not selling :) :) 
+        //     this.addInvestmentAdvice(Action.REDUCELONG, 0.1, 'ENSUSDT', `we reduce our ENSUSDT long position to fuck manipulators`)
+        // }
+        if ((pnlBTCLong > 20 && this.longBTCPosition.data.size > 0.001) || (pnlBTCLong > 100 && this.longBTCPosition.data.size === 0.001)) {
+            this.addInvestmentAdvice(Action.REDUCELONG, 0.001, 'BTCUSDT', `we reduce our BTCUSDT long position to fuck manipulators`)
+        }
+        if ((pnlSOLLong > 20 && this.longSOLPosition.data.size > 1 || (pnlSOLLong > 100 && this.longSOLPosition.data.size === 0.001))) {
             this.addInvestmentAdvice(Action.REDUCELONG, 1, 'SOLUSDT', `we reduce our SOLUSDT long position to fuck manipulators`)
         }
-        if (pnlENSLong > 20 && this.longENSPosition.data.size > 1111.1) {
-            this.addInvestmentAdvice(Action.REDUCELONG, 0.1, 'ENSUSDT', `we reduce our ENSUSDT long position to fuck manipulators`)
-        }
-        if (pnlADALong > 20 && this.longADAPosition.data.size > 1) {
+        if ((pnlADALong > 20 && this.longADAPosition.data.size > 1) || (pnlADALong > 100 && this.longADAPosition.data.size === 0.001)) {
             this.addInvestmentAdvice(Action.REDUCELONG, 1, 'ADAUSDT', `we reduce our ADAUSDT long position to fuck manipulators`)
         }
-        if (pnlDOTLong > 20 && this.longDOTPosition.data.size > 1) {
+        if ((pnlDOTLong > 20 && this.longDOTPosition.data.size > 1) || (pnlDOTLong > 100 && this.longDOTPosition.data.size === 0.001)) {
             this.addInvestmentAdvice(Action.REDUCELONG, 1, 'DOTUSDT', `we reduce our ENSUSDT long position to fuck manipulators`)
         }
-        if (pnlARLong > 20 && this.longARPosition.data.size > 1) {
+        if ((pnlARLong > 20 && this.longARPosition.data.size > 1) || (pnlARLong > 100 && this.longARPosition.data.size === 0.001)) {
             this.addInvestmentAdvice(Action.REDUCELONG, 1, 'ARUSDT', `we reduce our ENSUSDT long position to fuck manipulators`)
         }
 
