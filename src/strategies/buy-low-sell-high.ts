@@ -21,7 +21,7 @@ export interface IPositionInsights {
 
 export class BuyLowSellHigh extends VoFarmStrategy {
 
-    protected historyLength = 10
+    protected historyLength = 1000
     protected positionInsights: IPositionInsights[] = []
 
     public constructor(logger: VFLogger) {
@@ -54,8 +54,9 @@ export class BuyLowSellHigh extends VoFarmStrategy {
         for (const positionInsightsEntry of this.positionInsights) {
 
             const position = this.fundamentals.positions.filter((e: any) => e.data.symbol === positionInsightsEntry.tradingPair && e.data.side === 'Buy')[0]
-
-            if (position === undefined) continue
+            if (position === undefined) {
+                this.addInvestmentAdvice(Action.BUY, positionInsightsEntry.tradingUnit, positionInsightsEntry.tradingPair, `we open a ${positionInsightsEntry.tradingPair} ${positionInsightsEntry.direction} position to play the game`)
+            }
 
             const pnl = FinancialCalculator.getPNLOfPositionInPercent(position)
             if (this.positionInsights[0].sma.length === this.historyLength) {
@@ -66,15 +67,11 @@ export class BuyLowSellHigh extends VoFarmStrategy {
             const bollingerBands: IBollingerBands = BollingerBandsService.getBollingerBands(positionInsightsEntry.pnlHistory)
 
             positionInsightsEntry.sma = bollingerBands.sma
-            console.log("positionInsightsEntry.sma", positionInsightsEntry.sma.length)
-            console.log(this.positionInsights[0].sma.length)
 
             positionInsightsEntry.lowerBand = bollingerBands.lower
             positionInsightsEntry.upperBand = bollingerBands.upper
 
         }
-
-        // console.log(this.positionInsights)
 
     }
 
@@ -86,17 +83,12 @@ export class BuyLowSellHigh extends VoFarmStrategy {
             const side = (positionInsightsEntry.direction === EDirection.LONG) ? 'Buy' : 'Sell'
             const position = this.fundamentals.positions.filter((p: any) => p.data.side === side && p.data.symbol === positionInsightsEntry.tradingPair)[0]
 
-            if (position === undefined) {
-                this.addInvestmentAdvice(Action.BUY, positionInsightsEntry.tradingUnit, positionInsightsEntry.tradingPair, `we open a ${positionInsightsEntry.tradingPair} ${positionInsightsEntry.direction} position to play the game`)
-            }
-
-
             const pnl = positionInsightsEntry.pnlHistory[positionInsightsEntry.pnlHistory.length - 1]
             const sma = positionInsightsEntry.sma[positionInsightsEntry.sma.length - 2]
             const lower = positionInsightsEntry.lowerBand[positionInsightsEntry.lowerBand.length - 2]
             const upper = positionInsightsEntry.upperBand[positionInsightsEntry.upperBand.length - 2]
 
-            console.log(`${positionInsightsEntry.tradingPair} ${positionInsightsEntry.direction} - ${pnl} - ${sma} - ${lower} - ${upper}`)
+            console.log(`${positionInsightsEntry.tradingPair} ${positionInsightsEntry.direction} ${pnl} ${sma} ${lower} ${upper}`)
 
             if (this.liquidityLevel > 11) {
                 if (pnl < lower && ((upper - lower) > 10) && position.data.size < positionInsightsEntry.maxSize) {
