@@ -2,7 +2,7 @@ import { Action, EDirection, InvestmentAdvice } from "../../mod.ts"
 import { FinancialCalculator } from "../utilities/financial-calculator.ts"
 import { VFLogger } from "../utilities/logger.ts";
 import { VoFarmStrategy } from "./vofarm-strategy.ts";
-import { BollingerBandsService, IBollingerBands } from "https://deno.land/x/bollinger_bands@v0.1.0/mod.ts"
+import { BollingerBandsService, IBollingerBands } from "https://deno.land/x/bollinger_bands@v0.2.0/mod.ts"
 import { initialPositionInsights } from "../constants/initial-position-insights.ts";
 
 
@@ -50,8 +50,6 @@ export class BuyLowSellHigh extends VoFarmStrategy {
 
     private enrichPortfolioInsights() {
 
-        this.liquidityLevel = (this.fundamentals.accountInfo.result.USDT.available_balance / this.fundamentals.accountInfo.result.USDT.equity) * 20
-
         for (const positionInsightsEntry of this.positionInsights) {
 
             const position = this.fundamentals.positions.filter((e: any) => e.data.symbol === positionInsightsEntry.tradingPair && e.data.side === 'Buy')[0]
@@ -60,12 +58,13 @@ export class BuyLowSellHigh extends VoFarmStrategy {
             }
 
             const pnl = FinancialCalculator.getPNLOfPositionInPercent(position)
+
             if (this.positionInsights[0].sma.length === this.historyLength) {
                 positionInsightsEntry.pnlHistory.splice(0, 1)
             }
             positionInsightsEntry.pnlHistory.push(pnl)
 
-            const bollingerBands: IBollingerBands = BollingerBandsService.getBollingerBands(positionInsightsEntry.pnlHistory)
+            const bollingerBands: IBollingerBands = BollingerBandsService.getBollingerBands(positionInsightsEntry.pnlHistory, 5)
 
             positionInsightsEntry.sma = bollingerBands.sma
 
@@ -92,12 +91,12 @@ export class BuyLowSellHigh extends VoFarmStrategy {
             console.log(`${positionInsightsEntry.tradingPair} ${positionInsightsEntry.direction} ${pnl} ${sma} ${lower} ${upper}`)
 
             if (this.liquidityLevel > 11) {
-                if (pnl < lower && ((upper - lower) > 10) && position.data.size < positionInsightsEntry.maxSize) {
+                if (pnl < lower && position.data.size < positionInsightsEntry.maxSize) {
                     this.enhancePosition(positionInsightsEntry)
                 }
             }
             
-            if (pnl > upper && position.data.size > positionInsightsEntry.targetSize && ((upper - lower) > 5)) {
+            if (pnl > upper && position.data.size > positionInsightsEntry.targetSize) {
                 this.reducePosition(positionInsightsEntry)
             }
         }
