@@ -41,6 +41,8 @@ export class BuyLowSellHigh extends VoFarmStrategy {
 
         if (this.positionInsights[0].sma.length === this.historyLength) {
             this.executeBuyLowSellHigh()
+        } else {
+            console.log(this.positionInsights[0].sma.length)
         }
 
         return this.currentInvestmentAdvices
