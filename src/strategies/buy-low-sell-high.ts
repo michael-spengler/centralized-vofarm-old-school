@@ -38,7 +38,7 @@ export class BuyLowSellHigh extends VoFarmStrategy {
 
         this.enrichPortfolioInsights()
 
-        if (this.positionInsights[0].sma.length === this.historyLength) {
+        if (this.positionInsights[0].sma.length > this.historyLength / 10) {
             this.executeBuyLowSellHigh()
         } else {
             console.log(this.positionInsights[0].sma.length)
@@ -64,7 +64,7 @@ export class BuyLowSellHigh extends VoFarmStrategy {
             }
             positionInsightsEntry.pnlHistory.push(pnl)
 
-            const bollingerBands: IBollingerBands = BollingerBandsService.getBollingerBands(positionInsightsEntry.pnlHistory, 5)
+            const bollingerBands: IBollingerBands = BollingerBandsService.getBollingerBands(positionInsightsEntry.pnlHistory, 11)
 
             positionInsightsEntry.sma = bollingerBands.sma
 
