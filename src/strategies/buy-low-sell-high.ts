@@ -6,7 +6,6 @@ import { BollingerBandsService, IBollingerBands } from "https://deno.land/x/boll
 import { initialPositionInsights } from "../constants/initial-position-insights.ts";
 
 
-
 export interface IPositionInsights {
     tradingPair: string,
     direction: EDirection,
@@ -21,7 +20,7 @@ export interface IPositionInsights {
 
 export class BuyLowSellHigh extends VoFarmStrategy {
 
-    protected historyLength = 1000
+    protected historyLength = 100
     protected positionInsights: IPositionInsights[] = []
 
     public constructor(logger: VFLogger) {
@@ -84,7 +83,7 @@ export class BuyLowSellHigh extends VoFarmStrategy {
 
             const side = (positionInsightsEntry.direction === EDirection.LONG) ? 'Buy' : 'Sell'
             const position = this.fundamentals.positions.filter((p: any) => p.data.side === side && p.data.symbol === positionInsightsEntry.tradingPair)[0]
-
+            if (position === undefined) continue
             const pnl = positionInsightsEntry.pnlHistory[positionInsightsEntry.pnlHistory.length - 1]
             const sma = positionInsightsEntry.sma[positionInsightsEntry.sma.length - 2]
             const lower = positionInsightsEntry.lowerBand[positionInsightsEntry.lowerBand.length - 2]
@@ -94,18 +93,33 @@ export class BuyLowSellHigh extends VoFarmStrategy {
 
             if (this.liquidityLevel > 11) {
                 if (pnl < lower && ((upper - lower) > 10) && position.data.size < positionInsightsEntry.maxSize) {
-                    this.addInvestmentAdvice(Action.BUY, positionInsightsEntry.tradingUnit, positionInsightsEntry.tradingPair, `we enhance our ${positionInsightsEntry.tradingPair} ${positionInsightsEntry.direction} position to fuck manipulators`)
+                    this.enhancePosition(positionInsightsEntry)
                 }
             }
-
+            
             if (pnl > upper && position.data.size > positionInsightsEntry.targetSize) {
-                this.addInvestmentAdvice(Action.REDUCELONG, positionInsightsEntry.tradingUnit, positionInsightsEntry.tradingPair, `we reduce our ${positionInsightsEntry.tradingPair} ${positionInsightsEntry.direction} position to fuck manipulators`)
+                this.reducePosition(positionInsightsEntry)
             }
         }
 
     }
 
 
+    private enhancePosition(positionInsightsEntry: IPositionInsights) {
+        if (positionInsightsEntry.direction === EDirection.LONG) {
+            this.addInvestmentAdvice(Action.BUY, positionInsightsEntry.tradingUnit, positionInsightsEntry.tradingPair, `we enhance our ${positionInsightsEntry.tradingPair} ${positionInsightsEntry.direction} position to fuck manipulators`)
+        } else {
+            this.addInvestmentAdvice(Action.SELL, positionInsightsEntry.tradingUnit, positionInsightsEntry.tradingPair, `we enhance our ${positionInsightsEntry.tradingPair} ${positionInsightsEntry.direction} position to fuck manipulators`)
+        }
+    }
+    
+    private reducePosition(positionInsightsEntry: IPositionInsights) {
+        if (positionInsightsEntry.direction === EDirection.LONG) {
+            this.addInvestmentAdvice(Action.REDUCELONG, positionInsightsEntry.tradingUnit, positionInsightsEntry.tradingPair, `we reduce our ${positionInsightsEntry.tradingPair} ${positionInsightsEntry.direction} position to fuck manipulators`)
+        } else {
+            this.addInvestmentAdvice(Action.REDUCESHORT, positionInsightsEntry.tradingUnit, positionInsightsEntry.tradingPair, `we reduce our ${positionInsightsEntry.tradingPair} ${positionInsightsEntry.direction} position to fuck manipulators`)        
+        }
+    }
     
 
     
