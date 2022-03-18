@@ -97,7 +97,7 @@ export class BuyLowSellHigh extends VoFarmStrategy {
                 }
             }
             
-            if (pnl > upper && position.data.size > positionInsightsEntry.targetSize) {
+            if (pnl > upper && position.data.size > positionInsightsEntry.targetSize && ((upper - lower) > 5)) {
                 this.reducePosition(positionInsightsEntry)
             }
         }
