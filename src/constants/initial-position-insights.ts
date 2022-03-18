@@ -30,7 +30,7 @@ export const initialPositionInsights = [{
         upperBand: [],
         tradingUnit: 0.001,
         targetSize: 0.01,
-        maxSize: 0.002
+        maxSize: 0.02
     }, {
         tradingPair: 'ADAUSDT',
         direction: EDirection.LONG,
@@ -40,7 +40,7 @@ export const initialPositionInsights = [{
         upperBand: [],
         tradingUnit: 1,
         targetSize: 2,
-        maxSize: 4,
+        maxSize: 500,
 
     }, {
         tradingPair: 'SOLUSDT',
@@ -49,9 +49,9 @@ export const initialPositionInsights = [{
         sma: [],
         lowerBand: [],
         upperBand: [],
-        tradingUnit: 1,
+        tradingUnit: 0.1,
         targetSize: 2,
-        maxSize: 4,
+        maxSize: 5,
 
     }, {
         tradingPair: 'DOTUSDT',
@@ -60,7 +60,7 @@ export const initialPositionInsights = [{
         sma: [],
         lowerBand: [],
         upperBand: [],
-        tradingUnit: 1,
+        tradingUnit: 0.1,
         targetSize: 2,
-        maxSize: 4,
+        maxSize: 50,
     }]
