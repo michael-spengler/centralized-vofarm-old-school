@@ -1,14 +1,11 @@
-import { Action, InvestmentAdvice } from "../../mod.ts"
+import { Action, EDirection, InvestmentAdvice } from "../../mod.ts"
 import { FinancialCalculator } from "../utilities/financial-calculator.ts"
 import { VFLogger } from "../utilities/logger.ts";
 import { VoFarmStrategy } from "./vofarm-strategy.ts";
-import { BollingerBandsService, IBollingerBands } from "https://deno.land/x/bollinger_bands/mod.ts"
+import { BollingerBandsService, IBollingerBands } from "https://deno.land/x/bollinger_bands@v0.1.0/mod.ts"
+import { initialPositionInsights } from "../constants/initial-position-insights.ts";
 
 
-export enum EDirection {
-    LONG = "long",
-    SHORT = "short"
-}
 
 export interface IPositionInsights {
     tradingPair: string,
@@ -18,17 +15,18 @@ export interface IPositionInsights {
     lowerBand: number[],
     upperBand: number[],
     tradingUnit: number,
-    targetSize: number
+    targetSize: number,
+    maxSize: number
 }
 
 export class BuyLowSellHigh extends VoFarmStrategy {
 
-    protected historyLength = 100
+    protected historyLength = 10
     protected positionInsights: IPositionInsights[] = []
 
     public constructor(logger: VFLogger) {
         super(logger)
-        this.initializePositionInsights()
+        this.positionInsights = initialPositionInsights
     }
 
 
@@ -41,7 +39,6 @@ export class BuyLowSellHigh extends VoFarmStrategy {
 
         this.enrichPortfolioInsights()
 
-        console.log(this.positionInsights[0].sma.length)
         if (this.positionInsights[0].sma.length === this.historyLength) {
             this.executeBuyLowSellHigh()
         }
@@ -50,9 +47,39 @@ export class BuyLowSellHigh extends VoFarmStrategy {
 
     }
 
+    private enrichPortfolioInsights() {
+
+        this.liquidityLevel = (this.fundamentals.accountInfo.result.USDT.available_balance / this.fundamentals.accountInfo.result.USDT.equity) * 20
+
+        for (const positionInsightsEntry of this.positionInsights) {
+
+            const position = this.fundamentals.positions.filter((e: any) => e.data.symbol === positionInsightsEntry.tradingPair && e.data.side === 'Buy')[0]
+
+            if (position === undefined) continue
+
+            const pnl = FinancialCalculator.getPNLOfPositionInPercent(position)
+            if (this.positionInsights[0].sma.length === this.historyLength) {
+                positionInsightsEntry.pnlHistory.splice(0, 1)
+            }
+            positionInsightsEntry.pnlHistory.push(pnl)
+
+            const bollingerBands: IBollingerBands = BollingerBandsService.getBollingerBands(positionInsightsEntry.pnlHistory)
+
+            positionInsightsEntry.sma = bollingerBands.sma
+            console.log("positionInsightsEntry.sma", positionInsightsEntry.sma.length)
+            console.log(this.positionInsights[0].sma.length)
+
+            positionInsightsEntry.lowerBand = bollingerBands.lower
+            positionInsightsEntry.upperBand = bollingerBands.upper
+
+        }
+
+        // console.log(this.positionInsights)
+
+    }
 
 
-    protected executeBuyLowSellHigh() {
+    private executeBuyLowSellHigh() {
 
         for (const positionInsightsEntry of this.positionInsights) {
 
@@ -72,7 +99,7 @@ export class BuyLowSellHigh extends VoFarmStrategy {
             console.log(`${positionInsightsEntry.tradingPair} ${positionInsightsEntry.direction} - ${pnl} - ${sma} - ${lower} - ${upper}`)
 
             if (this.liquidityLevel > 11) {
-                if (pnl < lower) {
+                if (pnl < lower && ((upper - lower) > 10) && position.data.size < positionInsightsEntry.maxSize) {
                     this.addInvestmentAdvice(Action.BUY, positionInsightsEntry.tradingUnit, positionInsightsEntry.tradingPair, `we enhance our ${positionInsightsEntry.tradingPair} ${positionInsightsEntry.direction} position to fuck manipulators`)
                 }
             }
@@ -85,91 +112,9 @@ export class BuyLowSellHigh extends VoFarmStrategy {
     }
 
 
-    private enrichPortfolioInsights() {
+    
 
-        this.liquidityLevel = (this.fundamentals.accountInfo.result.USDT.available_balance / this.fundamentals.accountInfo.result.USDT.equity) * 20
-
-        for (const positionInsightsEntry of this.positionInsights) {
-            const position = this.fundamentals.positions.filter((e: any) => e.data.symbol === positionInsightsEntry.tradingPair && e.data.side === 'Buy')[0]
-
-            if (position === undefined) continue
-
-            const pnl = FinancialCalculator.getPNLOfPositionInPercent(position)
-            if (this.positionInsights[0].sma.length === this.historyLength) {
-                positionInsightsEntry.pnlHistory.splice(0, 1)
-            }
-            positionInsightsEntry.pnlHistory.push(pnl)
-
-            const bollingerBands: IBollingerBands = BollingerBandsService.getBollingerBands(positionInsightsEntry.pnlHistory)
-
-            positionInsightsEntry.sma = bollingerBands.sma
-            positionInsightsEntry.lowerBand = bollingerBands.lower
-            positionInsightsEntry.upperBand = bollingerBands.upper
-
-        }
-
-        // console.log(this.positionInsights)
-
-    }
-
-
-    private initializePositionInsights() {
-        this.positionInsights = [{
-            tradingPair: 'ETHUSDT',
-            direction: EDirection.LONG,
-            pnlHistory: [],
-            sma: [],
-            lowerBand: [],
-            upperBand: [],
-            tradingUnit: 0.01,
-            targetSize: 11.11,
-        }, {
-            tradingPair: 'ENSUSDT',
-            direction: EDirection.LONG,
-            pnlHistory: [],
-            sma: [],
-            lowerBand: [],
-            upperBand: [],
-            tradingUnit: 0.1,
-            targetSize: 1111.1,
-        }, {
-            tradingPair: 'BTCUSDT',
-            direction: EDirection.LONG,
-            pnlHistory: [],
-            sma: [],
-            lowerBand: [],
-            upperBand: [],
-            tradingUnit: 0.001,
-            targetSize: 0.01,
-        }, {
-            tradingPair: 'ADAUSDT',
-            direction: EDirection.LONG,
-            pnlHistory: [],
-            sma: [],
-            lowerBand: [],
-            upperBand: [],
-            tradingUnit: 1,
-            targetSize: 10,
-        }, {
-            tradingPair: 'SOLUSDT',
-            direction: EDirection.LONG,
-            pnlHistory: [],
-            sma: [],
-            lowerBand: [],
-            upperBand: [],
-            tradingUnit: 1,
-            targetSize: 10,
-        }, {
-            tradingPair: 'DOTUSDT',
-            direction: EDirection.LONG,
-            pnlHistory: [],
-            sma: [],
-            lowerBand: [],
-            upperBand: [],
-            tradingUnit: 1,
-            targetSize: 10,
-        }]
-    }
+    
 
 }
 

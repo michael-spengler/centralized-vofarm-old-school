@@ -12,3 +12,9 @@ export enum LogLevel {
     WARNING = 2,
     ERROR = 3,
 }
+
+
+export enum EDirection {
+    LONG = "long",
+    SHORT = "short"
+}
