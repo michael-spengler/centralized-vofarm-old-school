@@ -2,184 +2,173 @@ import { Action, InvestmentAdvice } from "../../mod.ts"
 import { FinancialCalculator } from "../utilities/financial-calculator.ts"
 import { VFLogger } from "../utilities/logger.ts";
 import { VoFarmStrategy } from "./vofarm-strategy.ts";
+import { BollingerBandsService, IBollingerBands } from "https://deno.land/x/bollinger_bands/mod.ts"
 
 
-export abstract class BuyLowSellHigh extends VoFarmStrategy {
+export enum EDirection {
+    LONG = "long",
+    SHORT = "short"
+}
 
-    protected iterationCount = 0
-    protected overallLSD: number = 0
-    protected overallPNL: number = 0
-    protected triggerForUltimateProfitTaking: number = 1 // 0.1
-    protected generalClosingTrigger: number = 100
-    protected historyLength = 1000
-    protected pauseCounter = 0
-    protected longBTCPosition: any
-    protected longETHPosition: any
-    protected longARPosition: any
-    protected longSOLPosition: any
-    protected longADAPosition: any
-    protected longENSPosition: any
-    protected longDOTPosition: any
+export interface IPositionInsights {
+    tradingPair: string,
+    direction: EDirection,
+    pnlHistory: number[],
+    sma: number[],
+    lowerBand: number[],
+    upperBand: number[],
+    tradingUnit: number,
+    targetSize: number
+}
+
+export class BuyLowSellHigh extends VoFarmStrategy {
+
+    protected historyLength = 100
+    protected positionInsights: IPositionInsights[] = []
 
     public constructor(logger: VFLogger) {
         super(logger)
-
+        this.initializePositionInsights()
     }
+
+
 
     public async getInvestmentAdvices(input: any): Promise<InvestmentAdvice[]> {
 
-        this.iterationCount++
-
-        if (this.pauseCounter > 0) {
-            this.pauseCounter--
-            return []
-        }
-
         this.currentInvestmentAdvices = []
 
+        await this.collectFundamentals(input.exchangeConnector)
 
-        if (input.fundamentals === undefined) {
-            await this.collectFundamentals(input.exchangeConnector)
-        } else {
-            this.fundamentals.accountInfo = input.fundamentals.accountInfo
-            this.fundamentals.positions = input.fundamentals.positions
+        this.enrichPortfolioInsights()
+
+        console.log(this.positionInsights[0].sma.length)
+        if (this.positionInsights[0].sma.length === this.historyLength) {
+            this.executeBuyLowSellHigh()
         }
 
-        this.liquidityLevel = (this.fundamentals.accountInfo.result.USDT.available_balance / this.fundamentals.accountInfo.result.USDT.equity) * 20
-
-        this.overallLSD = this.getOverallLSD()
-
-        this.initiate()
-        if (this.currentInvestmentAdvices.length > 0) {
-            if (this.currentInvestmentAdvices.length > 4) {
-                this.pauseCounter = 20
-            }
-            return this.currentInvestmentAdvices
-        }
-
-        this.executeBuyLowSellHigh()
-        if (this.currentInvestmentAdvices.length > 0) {
-            if (this.currentInvestmentAdvices.length > 4) {
-                this.pauseCounter = 20
-            }
-            return this.currentInvestmentAdvices
-        }
-
-
-        return []
+        return this.currentInvestmentAdvices
 
     }
 
 
-
-    protected initiate() {
-
-        this.longBTCPosition = this.fundamentals.positions.filter((p: any) => p.data.side === 'Buy' && p.data.symbol === 'BTCUSDT')[0]
-        this.longETHPosition = this.fundamentals.positions.filter((p: any) => p.data.side === 'Buy' && p.data.symbol === 'ETHUSDT')[0]
-        this.longENSPosition = this.fundamentals.positions.filter((p: any) => p.data.side === 'Buy' && p.data.symbol === 'ENSUSDT')[0]
-        this.longDOTPosition = this.fundamentals.positions.filter((p: any) => p.data.side === 'Buy' && p.data.symbol === 'DOTUSDT')[0]
-        this.longADAPosition = this.fundamentals.positions.filter((p: any) => p.data.side === 'Buy' && p.data.symbol === 'ADAUSDT')[0]
-        this.longSOLPosition = this.fundamentals.positions.filter((p: any) => p.data.side === 'Buy' && p.data.symbol === 'SOLUSDT')[0]
-        this.longARPosition = this.fundamentals.positions.filter((p: any) => p.data.side === 'Buy' && p.data.symbol === 'ARUSDT')[0]
-
-        if (this.fundamentals.accountInfo.result.USDT.equity === 0) {
-            throw new Error(`are you kidding me - how should I make money without an investment? :)`)
-        } else if (this.longBTCPosition === undefined) {
-            this.addInvestmentAdvice(Action.BUY, 0.001, 'BTCUSDT', `we open a BTCUSDT long position to play the game`)
-        } else if (this.longETHPosition === undefined) {
-            this.addInvestmentAdvice(Action.BUY, 0.01, 'ETHUSDT', `we open an ETHUSDT long position to play the game`)
-        } else if (this.longENSPosition === undefined) {
-            this.addInvestmentAdvice(Action.BUY, 0.1, 'ENSUSDT', `we open a ENSUSDT long position to play the game`)
-        } else if (this.longSOLPosition === undefined) {
-            this.addInvestmentAdvice(Action.BUY, 1, 'SOLUSDT', `we open an SOLUSDT long position to play the game`)
-        } else if (this.longADAPosition === undefined) {
-            this.addInvestmentAdvice(Action.BUY, 1, 'ADAUSDT', `we open a ADAUSDT long position to play the game`)
-        } else if (this.longDOTPosition === undefined) {
-            this.addInvestmentAdvice(Action.BUY, 1, 'DOTUSDT', `we open an DOTUSDT long position to play the game`)
-        } else if (this.longARPosition === undefined) {
-            this.addInvestmentAdvice(Action.BUY, 1, 'ARUSDT', `we open an ARUSDT long position to play the game`)
-        }
-
-
-    }
-
-    protected closeAll() {
-        for (const position of this.fundamentals.positions) {
-            try {
-                if (position.data.size > 0) {
-                    if (position.data.side === 'Buy') {
-                        this.addInvestmentAdvice(Action.REDUCELONG, Number(position.data.size), position.data.symbol, `we close ${position.data.size} ${position.data.symbol} long due to fuck it.`)
-                    }
-                    if (position.data.side === 'Sell') {
-                        this.addInvestmentAdvice(Action.REDUCESHORT, Number(position.data.size), position.data.symbol, `we close ${position.data.size} ${position.data.symbol} long due to fuck it.`)
-                    }
-                }
-            } catch (error) {
-                console.log(`was geht: ${error.message}`)
-            }
-        }
-    }
 
     protected executeBuyLowSellHigh() {
 
+        for (const positionInsightsEntry of this.positionInsights) {
 
-        const pnlBTCLong = FinancialCalculator.getPNLOfPositionInPercent(this.longBTCPosition)
-        const pnlETHLong = FinancialCalculator.getPNLOfPositionInPercent(this.longETHPosition)
-        const pnlARLong = FinancialCalculator.getPNLOfPositionInPercent(this.longARPosition)
-        const pnlSOLLong = FinancialCalculator.getPNLOfPositionInPercent(this.longSOLPosition)
-        const pnlADALong = FinancialCalculator.getPNLOfPositionInPercent(this.longADAPosition)
-        const pnlENSLong = FinancialCalculator.getPNLOfPositionInPercent(this.longENSPosition)
-        const pnlDOTLong = FinancialCalculator.getPNLOfPositionInPercent(this.longDOTPosition)
+            const side = (positionInsightsEntry.direction === EDirection.LONG) ? 'Buy' : 'Sell'
+            const position = this.fundamentals.positions.filter((p: any) => p.data.side === side && p.data.symbol === positionInsightsEntry.tradingPair)[0]
 
-        if (this.liquidityLevel > 11) {
-            if (pnlBTCLong < -11) {
-                this.addInvestmentAdvice(Action.BUY, 0.001, 'BTCUSDT', `we enhance our BTCUSDT long position to fuck manipulators`)
+            if (position === undefined) {
+                this.addInvestmentAdvice(Action.BUY, positionInsightsEntry.tradingUnit, positionInsightsEntry.tradingPair, `we open a ${positionInsightsEntry.tradingPair} ${positionInsightsEntry.direction} position to play the game`)
             }
-            if (pnlETHLong < -11) {
-                this.addInvestmentAdvice(Action.BUY, 0.01, 'ETHUSDT', `we enhance our ETHUSDT long position to fuck manipulators`)
+
+
+            const pnl = positionInsightsEntry.pnlHistory[positionInsightsEntry.pnlHistory.length - 1]
+            const sma = positionInsightsEntry.sma[positionInsightsEntry.sma.length - 2]
+            const lower = positionInsightsEntry.lowerBand[positionInsightsEntry.lowerBand.length - 2]
+            const upper = positionInsightsEntry.upperBand[positionInsightsEntry.upperBand.length - 2]
+
+            console.log(`${positionInsightsEntry.tradingPair} ${positionInsightsEntry.direction} - ${pnl} - ${sma} - ${lower} - ${upper}`)
+
+            if (this.liquidityLevel > 11) {
+                if (pnl < lower) {
+                    this.addInvestmentAdvice(Action.BUY, positionInsightsEntry.tradingUnit, positionInsightsEntry.tradingPair, `we enhance our ${positionInsightsEntry.tradingPair} ${positionInsightsEntry.direction} position to fuck manipulators`)
+                }
             }
-            if (pnlENSLong < -11) {
-                this.addInvestmentAdvice(Action.BUY, 0.1, 'ENSUSDT', `we enhance our ENSUSDT long position to fuck manipulators`)
-            }
-            if (pnlSOLLong < -11) {
-                this.addInvestmentAdvice(Action.BUY, 1, 'SOLUSDT', `we enhance our SOLUSDT long position to fuck manipulators`)
-            }
-            if (pnlADALong < -11) {
-                this.addInvestmentAdvice(Action.BUY, 1, 'ADAUSDT', `we enhance our ADAUSDT long position to fuck manipulators`)
-            }
-            if (pnlDOTLong < -11) {
-                this.addInvestmentAdvice(Action.BUY, 1, 'DOTUSDT', `we enhance our DOTUSDT long position to fuck manipulators`)
-            }
-            if (pnlARLong < -11) {
-                this.addInvestmentAdvice(Action.BUY, 1, 'ARUSDT', `we enhance our ARUSDT long position to fuck manipulators`)
+
+            if (pnl > upper && position.data.size > positionInsightsEntry.targetSize) {
+                this.addInvestmentAdvice(Action.REDUCELONG, positionInsightsEntry.tradingUnit, positionInsightsEntry.tradingPair, `we reduce our ${positionInsightsEntry.tradingPair} ${positionInsightsEntry.direction} position to fuck manipulators`)
             }
         }
 
-        if (pnlETHLong > 20 && this.longETHPosition.data.size > 11.11 || (pnlBTCLong > 200)) {
-            this.addInvestmentAdvice(Action.REDUCELONG, 0.01, 'ETHUSDT', `we reduce our ETHUSDT long position to fuck manipulators`)
-        }
-        // if (pnlENSLong > 20 && this.longENSPosition.data.size > 1111.1) { // we're not selling :) :) 
-        //     this.addInvestmentAdvice(Action.REDUCELONG, 0.1, 'ENSUSDT', `we reduce our ENSUSDT long position to fuck manipulators`)
-        // }
-        if ((pnlBTCLong > 20 && this.longBTCPosition.data.size > 0.001) || (pnlBTCLong > 200)) {
-            this.addInvestmentAdvice(Action.REDUCELONG, 0.001, 'BTCUSDT', `we reduce our BTCUSDT long position to fuck manipulators`)
-        }
-        if ((pnlSOLLong > 20 && this.longSOLPosition.data.size > 1 || (pnlSOLLong > 200))) {
-            this.addInvestmentAdvice(Action.REDUCELONG, 1, 'SOLUSDT', `we reduce our SOLUSDT long position to fuck manipulators`)
-        }
-        if ((pnlADALong > 20 && this.longADAPosition.data.size > 1) || (pnlADALong > 200)) {
-            this.addInvestmentAdvice(Action.REDUCELONG, 1, 'ADAUSDT', `we reduce our ADAUSDT long position to fuck manipulators`)
-        }
-        if ((pnlDOTLong > 20 && this.longDOTPosition.data.size > 1) || (pnlDOTLong > 200)) {
-            this.addInvestmentAdvice(Action.REDUCELONG, 1, 'DOTUSDT', `we reduce our ENSUSDT long position to fuck manipulators`)
-        }
-        if ((pnlARLong > 20 && this.longARPosition.data.size > 1) || (pnlARLong > 200)) {
-            this.addInvestmentAdvice(Action.REDUCELONG, 1, 'ARUSDT', `we reduce our ENSUSDT long position to fuck manipulators`)
-        }
+    }
 
 
+    private enrichPortfolioInsights() {
+
+        this.liquidityLevel = (this.fundamentals.accountInfo.result.USDT.available_balance / this.fundamentals.accountInfo.result.USDT.equity) * 20
+
+        for (const positionInsightsEntry of this.positionInsights) {
+            const position = this.fundamentals.positions.filter((e: any) => e.data.symbol === positionInsightsEntry.tradingPair && e.data.side === 'Buy')[0]
+
+            if (position === undefined) continue
+
+            const pnl = FinancialCalculator.getPNLOfPositionInPercent(position)
+            if (this.positionInsights[0].sma.length === this.historyLength) {
+                positionInsightsEntry.pnlHistory.splice(0, 1)
+            }
+            positionInsightsEntry.pnlHistory.push(pnl)
+
+            const bollingerBands: IBollingerBands = BollingerBandsService.getBollingerBands(positionInsightsEntry.pnlHistory)
+
+            positionInsightsEntry.sma = bollingerBands.sma
+            positionInsightsEntry.lowerBand = bollingerBands.lower
+            positionInsightsEntry.upperBand = bollingerBands.upper
+
+        }
+
+        // console.log(this.positionInsights)
+
+    }
 
 
+    private initializePositionInsights() {
+        this.positionInsights = [{
+            tradingPair: 'ETHUSDT',
+            direction: EDirection.LONG,
+            pnlHistory: [],
+            sma: [],
+            lowerBand: [],
+            upperBand: [],
+            tradingUnit: 0.01,
+            targetSize: 11.11,
+        }, {
+            tradingPair: 'ENSUSDT',
+            direction: EDirection.LONG,
+            pnlHistory: [],
+            sma: [],
+            lowerBand: [],
+            upperBand: [],
+            tradingUnit: 0.1,
+            targetSize: 1111.1,
+        }, {
+            tradingPair: 'BTCUSDT',
+            direction: EDirection.LONG,
+            pnlHistory: [],
+            sma: [],
+            lowerBand: [],
+            upperBand: [],
+            tradingUnit: 0.001,
+            targetSize: 0.01,
+        }, {
+            tradingPair: 'ADAUSDT',
+            direction: EDirection.LONG,
+            pnlHistory: [],
+            sma: [],
+            lowerBand: [],
+            upperBand: [],
+            tradingUnit: 1,
+            targetSize: 10,
+        }, {
+            tradingPair: 'SOLUSDT',
+            direction: EDirection.LONG,
+            pnlHistory: [],
+            sma: [],
+            lowerBand: [],
+            upperBand: [],
+            tradingUnit: 1,
+            targetSize: 10,
+        }, {
+            tradingPair: 'DOTUSDT',
+            direction: EDirection.LONG,
+            pnlHistory: [],
+            sma: [],
+            lowerBand: [],
+            upperBand: [],
+            tradingUnit: 1,
+            targetSize: 10,
+        }]
     }
 
 }

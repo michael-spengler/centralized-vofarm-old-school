@@ -104,19 +104,7 @@ export abstract class VoFarmStrategy implements IVoFarmStrategy {
 
         this.counter++
         if (this.counter === 1) {
-            for (const position of this.fundamentals.positions) {
-                if (position.data.size !== 0) {
-                    try {
-                        exchangeConnector.setLeverage(position.data.symbol, 100)
-                    } catch (error) {
-                        try {
-                            exchangeConnector.setLeverage(position.data.symbol, 50)
-                        } catch (error) {
-                            exchangeConnector.setLeverage(position.data.symbol, 25)
-                        }
-                    }
-                }
-            }
+            this.setLeverage(exchangeConnector)
         }
 
         this.liquidityLevel = (this.fundamentals.accountInfo.result.USDT.available_balance / this.fundamentals.accountInfo.result.USDT.equity) * 20
@@ -138,6 +126,22 @@ export abstract class VoFarmStrategy implements IVoFarmStrategy {
 
     protected compareConsistencyLedger() {
         // tbd
+    }
+
+    protected setLeverage(exchangeConnector: IExchangeConnector) {
+        for (const position of this.fundamentals.positions) {
+            if (position.data.size !== 0) {
+                try {
+                    exchangeConnector.setLeverage(position.data.symbol, 100)
+                } catch (error) {
+                    try {
+                        exchangeConnector.setLeverage(position.data.symbol, 50)
+                    } catch (error) {
+                        exchangeConnector.setLeverage(position.data.symbol, 25)
+                    }
+                }
+            }
+        }
     }
 
     protected getOverallLSD(): number {
