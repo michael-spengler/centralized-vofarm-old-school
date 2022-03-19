@@ -54,7 +54,7 @@ export class BuyLowSellHigh extends VoFarmStrategy {
 
             const position = this.fundamentals.positions.filter((e: any) => e.data.symbol === positionInsightsEntry.tradingPair && e.data.side === 'Buy')[0]
             if (position === undefined) {
-                this.addInvestmentAdvice(Action.BUY, positionInsightsEntry.tradingUnit, positionInsightsEntry.tradingPair, `we open a ${positionInsightsEntry.tradingPair} ${positionInsightsEntry.direction} position to play the game`)
+                this.enhancePosition(positionInsightsEntry)
             }
 
             const pnl = FinancialCalculator.getPNLOfPositionInPercent(position)
