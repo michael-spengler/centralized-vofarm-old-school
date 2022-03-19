@@ -84,12 +84,11 @@ export class BuyLowSellHigh extends VoFarmStrategy {
             const position = this.fundamentals.positions.filter((p: any) => p.data.side === side && p.data.symbol === positionInsightsEntry.tradingPair)[0]
             if (position === undefined) continue
             const pnl = positionInsightsEntry.pnlHistory[positionInsightsEntry.pnlHistory.length - 1]
-            const sma = Number( positionInsightsEntry.sma[positionInsightsEntry.sma.length - 2].toFixed(2))
             const lower = Number(positionInsightsEntry.lowerBand[positionInsightsEntry.lowerBand.length - 2].toFixed(2))
             const upper = Number(positionInsightsEntry.upperBand[positionInsightsEntry.upperBand.length - 2].toFixed(2))
 
             // console.log(JSON.stringify(position))
-            console.log(`${position.data.size} ${positionInsightsEntry.tradingPair} (${Number(position.data.position_value.toFixed(2))}) ${positionInsightsEntry.direction} ${pnl} ${sma} ${lower} ${upper}`)
+            console.log(`${position.data.size} ${positionInsightsEntry.tradingPair} (${Number(position.data.position_value.toFixed(0))}) ${positionInsightsEntry.direction} ${pnl} ${lower} ${upper}`)
 
             if (this.liquidityLevel > 11) {
                 if (pnl < lower && position.data.size < positionInsightsEntry.maxSize) {
