@@ -110,7 +110,7 @@ export abstract class VoFarmStrategy implements IVoFarmStrategy {
         this.liquidityLevel = (this.fundamentals.accountInfo.result.USDT.available_balance / this.fundamentals.accountInfo.result.USDT.equity) * 20
         const overallLSD = this.getOverallLSD()
         this.riskEquityRatio = Math.ceil(overallLSD / this.fundamentals.accountInfo.result.USDT.equity)
-        const message = `\n*********** equity: ${this.fundamentals.accountInfo.result.USDT.equity.toFixed(2)} - ll: ${this.liquidityLevel.toFixed(2)} - lsd: ${overallLSD.toFixed(2)} - rer: ${this.riskEquityRatio}***********`
+        const message = `\n*********** equity: ${this.fundamentals.accountInfo.result.USDT.equity.toFixed(2)} - ll: ${this.liquidityLevel.toFixed(2)} - lsd: ${overallLSD.toFixed(2)} ***********`
         this.logger.log("(----------------------------------------------------------------------------------", 1)
         this.logger.log(message, 1)
 
