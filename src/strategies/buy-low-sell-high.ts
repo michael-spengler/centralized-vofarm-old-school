@@ -64,7 +64,7 @@ export class BuyLowSellHigh extends VoFarmStrategy {
             }
             positionInsightsEntry.pnlHistory.push(pnl)
 
-            const bollingerBands: IBollingerBands = BollingerBandsService.getBollingerBands(positionInsightsEntry.pnlHistory, 12)
+            const bollingerBands: IBollingerBands = BollingerBandsService.getBollingerBands(positionInsightsEntry.pnlHistory, 14)
 
             positionInsightsEntry.sma = bollingerBands.sma
 
