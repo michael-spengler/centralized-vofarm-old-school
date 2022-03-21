@@ -20,7 +20,7 @@ export interface IPositionInsights {
 
 export class BuyLowSellHigh extends VoFarmStrategy {
 
-    protected historyLength = 100
+    protected historyLength = 50
     protected positionInsights: IPositionInsights[] = []
     protected spreadFactor = 0
     protected minPNL = 0
