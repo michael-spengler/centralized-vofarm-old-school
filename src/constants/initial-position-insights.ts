@@ -3,16 +3,16 @@ import { EDirection } from "./enums.ts";
 
 export const initialPositionInsights = [
     {
-    tradingPair: 'ENSUSDT',
-    direction: EDirection.LONG,
-    pnlHistory: [],
-    sma: [],
-    lowerBand: [],
-    upperBand: [],
-    tradingUnit: 0.1,
-    targetSize: 1111.1,
-    maxSize: 2222.2,
-    },{
+        tradingPair: 'ENSUSDT',
+        direction: EDirection.LONG,
+        pnlHistory: [],
+        sma: [],
+        lowerBand: [],
+        upperBand: [],
+        tradingUnit: 1,
+        targetSize: 1111.1,
+        maxSize: 2222.2,
+    }, {
         tradingPair: 'ETHUSDT',
         direction: EDirection.LONG,
         pnlHistory: [],
@@ -20,9 +20,9 @@ export const initialPositionInsights = [
         lowerBand: [],
         upperBand: [],
         tradingUnit: 0.01,
-        targetSize: 11.11,
-        maxSize: 22.22,
-    },  {
+        targetSize: 1.11,
+        maxSize: 22.2,
+    }, {
         tradingPair: 'BTCUSDT',
         direction: EDirection.LONG,
         pnlHistory: [],
@@ -32,7 +32,7 @@ export const initialPositionInsights = [
         tradingUnit: 0.001,
         targetSize: 0.01,
         maxSize: 0.02
-    },{
+    }, {
         tradingPair: 'XMRUSDT',
         direction: EDirection.LONG,
         pnlHistory: [],
@@ -74,7 +74,7 @@ export const initialPositionInsights = [
         tradingUnit: 0.1,
         targetSize: 2,
         maxSize: 50,
-    },{
+    }, {
         tradingPair: 'BNBUSDT',
         direction: EDirection.LONG,
         pnlHistory: [],
@@ -94,7 +94,7 @@ export const initialPositionInsights = [
         tradingUnit: 1,
         targetSize: 1,
         maxSize: 10,
-    },{
+    }, {
         tradingPair: 'UNIUSDT',
         direction: EDirection.LONG,
         pnlHistory: [],
@@ -156,7 +156,7 @@ export const initialPositionInsights = [
         tradingUnit: 1,
         targetSize: 2,
         maxSize: 10,
-    },{
+    }, {
         tradingPair: 'SHIB1000USDT',
         direction: EDirection.SHORT,
         pnlHistory: [],
@@ -166,7 +166,7 @@ export const initialPositionInsights = [
         tradingUnit: 100,
         targetSize: 200,
         maxSize: 10000,
-    },{
+    }, {
         tradingPair: 'CHRUSDT',
         direction: EDirection.SHORT,
         pnlHistory: [],
@@ -176,7 +176,7 @@ export const initialPositionInsights = [
         tradingUnit: 10,
         targetSize: 20,
         maxSize: 500,
-    },{
+    }, {
         tradingPair: 'ATOMUSDT',
         direction: EDirection.SHORT,
         pnlHistory: [],
@@ -186,7 +186,7 @@ export const initialPositionInsights = [
         tradingUnit: 1,
         targetSize: 1,
         maxSize: 20,
-    },{
+    }, {
         tradingPair: 'LTCUSDT',
         direction: EDirection.SHORT,
         pnlHistory: [],
@@ -196,7 +196,7 @@ export const initialPositionInsights = [
         tradingUnit: 1,
         targetSize: 1,
         maxSize: 10,
-    },{
+    }, {
         tradingPair: 'BCHUSDT',
         direction: EDirection.SHORT,
         pnlHistory: [],
@@ -206,7 +206,7 @@ export const initialPositionInsights = [
         tradingUnit: 1,
         targetSize: 1,
         maxSize: 5,
-    },{
+    }, {
         tradingPair: 'XLMUSDT',
         direction: EDirection.SHORT,
         pnlHistory: [],
@@ -216,7 +216,7 @@ export const initialPositionInsights = [
         tradingUnit: 10,
         targetSize: 10,
         maxSize: 200,
-    },{
+    }, {
         tradingPair: 'ICPUSDT',
         direction: EDirection.SHORT,
         pnlHistory: [],
@@ -226,7 +226,7 @@ export const initialPositionInsights = [
         tradingUnit: 1,
         targetSize: 1,
         maxSize: 50,
-    },{
+    }, {
         tradingPair: 'SANDUSDT',
         direction: EDirection.SHORT,
         pnlHistory: [],
