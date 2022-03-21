@@ -22,6 +22,8 @@ export class BuyLowSellHigh extends VoFarmStrategy {
 
     protected historyLength = 100
     protected positionInsights: IPositionInsights[] = []
+    protected spreadFactor = 0
+    protected minPNL = 0
 
     public constructor(logger: VFLogger) {
         super(logger)
@@ -50,8 +52,9 @@ export class BuyLowSellHigh extends VoFarmStrategy {
 
     private enrichPortfolioInsights() {
 
-        const spreadFactor = Number((20 - this.liquidityLevel).toFixed(0))
-        console.log('spreadFactor:', spreadFactor)
+        this.spreadFactor = Number((20 - this.liquidityLevel).toFixed(0))
+        this.minPNL = 20 - this.spreadFactor
+        console.log('spreadFactor:', this.spreadFactor, ' / minPNL:', this.minPNL)
 
         for (const positionInsightsEntry of this.positionInsights) {
             const side = (positionInsightsEntry.direction === EDirection.LONG) ? 'Buy' : 'Sell'
@@ -66,7 +69,7 @@ export class BuyLowSellHigh extends VoFarmStrategy {
                 positionInsightsEntry.pnlHistory.splice(0, 1)
             }
             positionInsightsEntry.pnlHistory.push(pnl)
-            const bollingerBands: IBollingerBands = BollingerBandsService.getBollingerBands(positionInsightsEntry.pnlHistory, spreadFactor)
+            const bollingerBands: IBollingerBands = BollingerBandsService.getBollingerBands(positionInsightsEntry.pnlHistory, this.spreadFactor)
 
             positionInsightsEntry.sma = bollingerBands.sma
 
@@ -98,7 +101,7 @@ export class BuyLowSellHigh extends VoFarmStrategy {
                 }
             }
 
-            if (pnl > upper && pnl > 24 && position.data.size > positionInsightsEntry.targetSize) {
+            if (pnl > upper && pnl > this.minPNL && position.data.size > positionInsightsEntry.targetSize) {
                 this.reducePosition(positionInsightsEntry)
             }
         }
