@@ -14,8 +14,7 @@ export interface IPositionInsights {
     lowerBand: number[],
     upperBand: number[],
     tradingUnit: number,
-    targetSize: number,
-    maxSize: number
+    targetSize: number
 }
 
 export class BuyLowSellHigh extends VoFarmStrategy {
@@ -96,7 +95,7 @@ export class BuyLowSellHigh extends VoFarmStrategy {
             console.log(`${position.data.size} ${positionInsightsEntry.tradingPair} (${Number(position.data.position_value.toFixed(0))}) ${positionInsightsEntry.direction} ${pnl} ${lower} ${upper}`)
 
             if (this.liquidityLevel > 3) {
-                if (pnl < lower && position.data.size < positionInsightsEntry.maxSize) {
+                if (pnl < lower) {
                     this.enhancePosition(positionInsightsEntry)
                 }
             }
