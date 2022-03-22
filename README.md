@@ -1,5 +1,5 @@
 # Centralized Volatility Farming
-Until layer 2 scaling solutions like Arbitrum etc. are ready for Volatility Farming, centralized volatility farming seems a reasonable thing to do - exploiting manipulation induced (or at least non fundamentals based volatility) to improve price stability and the own wallet :)   
+Until layer 2 scaling solutions like Arbitrum etc. are ready for Volatility Farming, **centralized** volatility farming seems a reasonable thing to do - exploiting manipulation induced (or at least non fundamentals based volatility) to improve price stability and the own wallet :)   
 
 ## Using bybit.com as an example 
 1. Deposit e.g. 500 USDT onto your Derivatives Account (potentially exchange your other asset to USDT and transfer them to the Derivatives to start trading via USDT perpetuals)  
