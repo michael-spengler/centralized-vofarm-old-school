@@ -45,10 +45,8 @@ export const initialPositionInsights = [
         sma: [],
         lowerBand: [],
         upperBand: [],
-        tradingUnit: 1,
-        targetSize: 2,
-        maxSize: 500,
-
+        tradingUnit: 10,
+        targetSize: 20,
     }, {
         tradingPair: 'SOLUSDT',
         direction: EDirection.LONG,
