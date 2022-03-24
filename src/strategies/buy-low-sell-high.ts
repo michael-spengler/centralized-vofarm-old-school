@@ -58,7 +58,7 @@ export class BuyLowSellHigh extends VoFarmStrategy {
         for (const positionInsightsEntry of this.positionInsights) {
             const side = (positionInsightsEntry.direction === EDirection.LONG) ? 'Buy' : 'Sell'
             const position = this.fundamentals.positions.filter((e: any) => e.data.symbol === positionInsightsEntry.tradingPair && e.data.side === side)[0]
-            if (position === undefined) {
+            if (position === undefined && this.liquidityLevel > 1) {
                 this.enhancePosition(positionInsightsEntry)
             }
 
