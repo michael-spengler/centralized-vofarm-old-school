@@ -9,7 +9,7 @@ export const initialPositionInsights = [
         sma: [],
         lowerBand: [],
         upperBand: [],
-        tradingUnit: 1,
+        tradingUnit: 10,
         targetSize: 1111.1,
     }, {
         tradingPair: 'ETHUSDT',
