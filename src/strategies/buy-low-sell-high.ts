@@ -52,7 +52,7 @@ export class BuyLowSellHigh extends VoFarmStrategy {
     private enrichPortfolioInsights() {
 
         this.spreadFactor = Number((20 - this.liquidityLevel).toFixed(0))
-        if (this.spreadFactor < 5) this.spreadFactor = 5
+        if (this.spreadFactor < 5) this.spreadFactor = 7
         this.minPNL = 20 - this.spreadFactor
         console.log('spreadFactor:', this.spreadFactor, ' / minPNL:', this.minPNL)
 
