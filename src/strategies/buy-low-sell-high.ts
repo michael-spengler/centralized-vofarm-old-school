@@ -88,6 +88,10 @@ export class BuyLowSellHigh extends VoFarmStrategy {
 
 
     private executeBuyLowSellHigh() {
+        const d = new Date();
+        let day = d.getDay()
+        console.log(day)
+        const ratherCloseOperand = 0
 
         for (const positionInsightsEntry of this.positionInsights) {
 
@@ -95,21 +99,23 @@ export class BuyLowSellHigh extends VoFarmStrategy {
             const position = this.fundamentals.positions.filter((p: any) => p.data.side === side && p.data.symbol === positionInsightsEntry.tradingPair)[0]
             if (position === undefined) continue
             const pnl = positionInsightsEntry.pnlHistory[positionInsightsEntry.pnlHistory.length - 1]
-            const lower = Number(positionInsightsEntry.lowerBand[positionInsightsEntry.lowerBand.length - 2].toFixed(2))
-            const upper = Number(positionInsightsEntry.upperBand[positionInsightsEntry.upperBand.length - 2].toFixed(2))
+
+            const enhancePositionTrigger = Number(positionInsightsEntry.lowerBand[positionInsightsEntry.lowerBand.length - 2].toFixed(2))
+            const reducePositionTrigger = Number(positionInsightsEntry.upperBand[positionInsightsEntry.upperBand.length - 2].toFixed(2)) - ratherCloseOperand
 
             // console.log(JSON.stringify(position))
-            console.log(`${position.data.size} ${positionInsightsEntry.tradingPair} (${Number(position.data.position_value.toFixed(0))}) ${positionInsightsEntry.direction} ${pnl} ${lower} ${upper}`)
+            console.log(`${position.data.size} ${positionInsightsEntry.tradingPair} (${Number(position.data.position_value.toFixed(0))}) ${positionInsightsEntry.direction} ${pnl} ${enhancePositionTrigger} ${reducePositionTrigger}`)
 
             if (this.liquidityLevel > 3) {
-                if (pnl < lower) {
+                if (pnl < enhancePositionTrigger) {
                     this.enhancePosition(positionInsightsEntry)
                 }
             }
 
-            if (pnl > upper && pnl > this.minPNL && position.data.size > positionInsightsEntry.targetSize) {
+            if (pnl > reducePositionTrigger && pnl > this.minPNL && position.data.size > positionInsightsEntry.targetSize) {
                 this.reducePosition(positionInsightsEntry)
             }
+
         }
 
     }
