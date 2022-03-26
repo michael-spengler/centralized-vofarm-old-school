@@ -159,4 +159,22 @@ export abstract class VoFarmStrategy implements IVoFarmStrategy {
         return longValue - shortValue
 
     }
+
+    protected getOverallLSDInPercent(): number {
+        let longValue = 0
+        let shortValue = 0
+
+        for (const position of this.fundamentals.positions) {
+            if (position.data.side === 'Buy') {
+                longValue = longValue + position.data.position_value
+            } else if (position.data.side === 'Sell') {
+                shortValue = shortValue + position.data.position_value
+            }
+        }
+
+        const overall = longValue + shortValue
+
+        return (longValue * 100) / overall
+
+    }
 }

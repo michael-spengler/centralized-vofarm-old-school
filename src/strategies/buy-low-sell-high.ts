@@ -55,10 +55,13 @@ export class BuyLowSellHigh extends VoFarmStrategy {
         const shortENSPosition = this.fundamentals.positions.filter((e: any) => e.data.symbol === "ENSUSDT" && e.data.side === 'Sell')[0]
         const shortENSPositionPNL = FinancialCalculator.getPNLOfPositionInPercent(shortENSPosition)
         const insights = this.positionInsights.filter((e: IPositionInsights) => e.tradingPair === 'ENSUSDT' && e.direction === EDirection.SHORT)[0]
-        const overallLSD = this.getOverallLSD()
-        if (overallLSD > 30000 && shortENSPositionPNL < -1) {
+        const overallLSDInPercent = this.getOverallLSDInPercent()
+
+        console.log(overallLSDInPercent)
+
+        if (overallLSDInPercent > 65 && insights.sma.length > 1 && shortENSPositionPNL < insights.sma[insights.sma.length - 2]) {
             this.enhancePosition(insights)
-        } else if (overallLSD < 35000 && shortENSPositionPNL > 24) {
+        } else if (overallLSDInPercent < 75 && shortENSPositionPNL > 24) {
             this.reducePosition(insights)
 
         }
