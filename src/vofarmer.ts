@@ -68,6 +68,9 @@ export class VolatilityFarmer {
 
             }
 
+            if (r.ret_code !== 0) {
+                console.log(r)
+            }
         }
 
     }

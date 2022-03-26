@@ -45,8 +45,23 @@ export class BuyLowSellHigh extends VoFarmStrategy {
             console.log(this.positionInsights[0].sma.length)
         }
 
+        this.hedge()
+
         return this.currentInvestmentAdvices
 
+    }
+
+    private hedge() {
+        const shortENSPosition = this.fundamentals.positions.filter((e: any) => e.data.symbol === "ENSUSDT" && e.data.side === 'Sell')[0]
+        const shortENSPositionPNL = FinancialCalculator.getPNLOfPositionInPercent(shortENSPosition)
+        const insights = this.positionInsights.filter((e: IPositionInsights) => e.tradingPair === 'ENSUSDT' && e.direction === EDirection.SHORT)[0]
+        const overallLSD = this.getOverallLSD()
+        if (overallLSD > 30000 && shortENSPositionPNL < -1) {
+            this.enhancePosition(insights)
+        } else if (overallLSD < 35000 && shortENSPositionPNL > 24) {
+            this.reducePosition(insights)
+
+        }
     }
 
     private enrichPortfolioInsights() {
@@ -106,7 +121,7 @@ export class BuyLowSellHigh extends VoFarmStrategy {
             // console.log(JSON.stringify(position))
             console.log(`${position.data.size} ${positionInsightsEntry.tradingPair} (${Number(position.data.position_value.toFixed(0))}) ${positionInsightsEntry.direction} ${pnl} ${enhancePositionTrigger} ${reducePositionTrigger}`)
 
-            if (this.liquidityLevel > 3) {
+            if (this.liquidityLevel > 0.5) {
                 if (pnl < enhancePositionTrigger) {
                     this.enhancePosition(positionInsightsEntry)
                 }
