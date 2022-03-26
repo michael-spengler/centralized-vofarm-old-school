@@ -54,16 +54,18 @@ export class BuyLowSellHigh extends VoFarmStrategy {
     private hedge() {
         const shortENSPosition = this.fundamentals.positions.filter((e: any) => e.data.symbol === "ENSUSDT" && e.data.side === 'Sell')[0]
         const shortENSPositionPNL = FinancialCalculator.getPNLOfPositionInPercent(shortENSPosition)
-        const insights = this.positionInsights.filter((e: IPositionInsights) => e.tradingPair === 'ENSUSDT' && e.direction === EDirection.SHORT)[0]
+        const longENSinsights = this.positionInsights.filter((e: IPositionInsights) => e.tradingPair === 'ENSUSDT' && e.direction === EDirection.LONG)[0]
+        const shortENSinsights = this.positionInsights.filter((e: IPositionInsights) => e.tradingPair === 'ENSUSDT' && e.direction === EDirection.SHORT)[0]
         const overallLSDInPercent = this.getOverallLSDInPercent()
 
         console.log(overallLSDInPercent)
 
-        if (overallLSDInPercent > 65 && insights.sma.length > 1 && shortENSPositionPNL < insights.sma[insights.sma.length - 2]) {
-            this.enhancePosition(insights)
+        if (this.liquidityLevel > 0.3 && overallLSDInPercent > 65 && shortENSinsights.sma.length > 1 && shortENSPositionPNL < shortENSinsights.sma[shortENSinsights.sma.length - 2]) {
+            this.enhancePosition(shortENSinsights)
         } else if (overallLSDInPercent < 75 && shortENSPositionPNL > 24) {
-            this.reducePosition(insights)
-
+            this.reducePosition(shortENSinsights)
+        } else if (this.liquidityLevel > 0.3 && overallLSDInPercent < 0) {
+            this.enhancePosition(longENSinsights)
         }
     }
 
@@ -106,9 +108,7 @@ export class BuyLowSellHigh extends VoFarmStrategy {
 
 
     private executeBuyLowSellHigh() {
-        const d = new Date();
-        let day = d.getDay()
-        console.log(day)
+
         const ratherCloseOperand = 0
 
         for (const positionInsightsEntry of this.positionInsights) {
