@@ -14,7 +14,7 @@ export interface IPositionInsights {
     lowerBand: number[],
     upperBand: number[],
     tradingUnit: number,
-    targetSize: number
+    targetPositionMargin: number
 }
 
 export class BuyLowSellHigh extends VoFarmStrategy {
@@ -39,39 +39,23 @@ export class BuyLowSellHigh extends VoFarmStrategy {
 
         this.enrichPortfolioInsights()
 
-        if (this.positionInsights[0].sma.length === this.historyLength) {
+        if (this.positionInsights[0].sma.length === this.historyLength || this.positionInsights[0].sma.length === 3) {
             this.executeBuyLowSellHigh()
         } else {
             console.log(this.positionInsights[0].sma.length)
         }
 
-        this.hedge()
-
+        for (const p of this.fundamentals.positions) {
+            if (p.data.side === 'Sell') {
+                this.addInvestmentAdvice(Action.REDUCESHORT, p.data.size, p.data.symbol, 'inflation of fiat money suggests not to short crypto')
+            }
+        }
         return this.currentInvestmentAdvices
 
     }
 
-    private hedge() {
-        const shortENSPosition = this.fundamentals.positions.filter((e: any) => e.data.symbol === "ENSUSDT" && e.data.side === 'Sell')[0]
-        const shortENSPositionPNL = FinancialCalculator.getPNLOfPositionInPercent(shortENSPosition)
-        const longENSinsights = this.positionInsights.filter((e: IPositionInsights) => e.tradingPair === 'ENSUSDT' && e.direction === EDirection.LONG)[0]
-        const shortENSinsights = this.positionInsights.filter((e: IPositionInsights) => e.tradingPair === 'ENSUSDT' && e.direction === EDirection.SHORT)[0]
-        const overallLSDInPercent = this.getOverallLSDInPercent()
-
-        console.log(overallLSDInPercent)
-
-        if (this.liquidityLevel > 0.3 && overallLSDInPercent > 65 && shortENSinsights.sma.length > 1 && shortENSPositionPNL < shortENSinsights.sma[shortENSinsights.sma.length - 2]) {
-            this.enhancePosition(shortENSinsights)
-        } else if (overallLSDInPercent < 75 && shortENSPositionPNL > 24) {
-            this.reducePosition(shortENSinsights)
-        } else if (this.liquidityLevel > 0.3 && overallLSDInPercent < 0) {
-            this.enhancePosition(longENSinsights)
-        }
-    }
-
     private enrichPortfolioInsights() {
 
-        // this.spreadFactor = Number((42 - (this.liquidityLevel * 2)))
         if (this.liquidityLevel === 0) {
             this.spreadFactor = 111
         } else {
@@ -118,11 +102,19 @@ export class BuyLowSellHigh extends VoFarmStrategy {
             if (position === undefined) continue
             const pnl = positionInsightsEntry.pnlHistory[positionInsightsEntry.pnlHistory.length - 1]
 
-            const enhancePositionTrigger = Number(positionInsightsEntry.lowerBand[positionInsightsEntry.lowerBand.length - 2].toFixed(2))
+            const positionMarginInPercent = Number(((position.data.position_margin * 100) / this.fundamentals.accountInfo.result.USDT.equity).toFixed(2))
+            // console.log(JSON.stringify(position))
+
+            let enhancePositionTrigger = Number(positionInsightsEntry.lowerBand[positionInsightsEntry.lowerBand.length - 2].toFixed(2))
+            const date = new Date()
+            if ((date.getDay() === 0 && date.getHours() > 17) || date.getDay() === 1 && date.getHours() < 17) {
+                console.log("we're in a pretty bullish state of mind :)")
+                enhancePositionTrigger = Number(positionInsightsEntry.sma[positionInsightsEntry.lowerBand.length - 2].toFixed(2))
+            }
+
             const reducePositionTrigger = Number(positionInsightsEntry.upperBand[positionInsightsEntry.upperBand.length - 2].toFixed(2)) - ratherCloseOperand
 
-            // console.log(JSON.stringify(position))
-            console.log(`${position.data.size} ${positionInsightsEntry.tradingPair} (${Number(position.data.position_value.toFixed(0))}) ${positionInsightsEntry.direction} ${pnl} ${enhancePositionTrigger} ${reducePositionTrigger}`)
+            console.log(`${position.data.size} ${positionInsightsEntry.tradingPair} (${Number(position.data.position_value.toFixed(0))}) ${positionInsightsEntry.direction} ${pnl} ${enhancePositionTrigger} ${reducePositionTrigger} ${positionMarginInPercent}`)
 
             if (this.liquidityLevel > 0.5) {
                 if (pnl < enhancePositionTrigger) {
@@ -130,7 +122,7 @@ export class BuyLowSellHigh extends VoFarmStrategy {
                 }
             }
 
-            if (pnl > reducePositionTrigger && (pnl > this.minPNL || this.liquidityLevel === 0) && position.data.size > positionInsightsEntry.targetSize) {
+            if (pnl > reducePositionTrigger && (pnl > this.minPNL || this.liquidityLevel === 0) && positionMarginInPercent > positionInsightsEntry.targetPositionMargin) {
                 this.reducePosition(positionInsightsEntry)
             }
 
