@@ -23,6 +23,7 @@ export class BuyLowSellHigh extends VoFarmStrategy {
     protected positionInsights: IPositionInsights[] = []
     protected spreadFactor = 0
     protected minPNL = 0
+    protected bearishBullishIndicator = 0
 
     public constructor(logger: VFLogger) {
         super(logger)
@@ -38,6 +39,15 @@ export class BuyLowSellHigh extends VoFarmStrategy {
         await this.collectFundamentals(input.exchangeConnector)
 
         this.enrichPortfolioInsights()
+
+        const date = new Date()
+        if ((date.getDay() === 0 && date.getHours() > 17) || date.getDay() === 1 && date.getHours() < 17) {
+            console.log("we're in a pretty bullish state of mind :) - enhancing early")
+            this.bearishBullishIndicator = 1
+        } else if ((date.getDay() === 5 && date.getHours() > 17) || date.getDay() === 6 || date.getDay() === 0 && date.getHours() < 17) {
+            console.log("we're in a pretty bearish state of mind :) - reducing early")
+            this.bearishBullishIndicator = -1
+        }
 
         if (this.positionInsights[0].sma.length === this.historyLength) {
             this.executeBuyLowSellHigh()
@@ -93,8 +103,6 @@ export class BuyLowSellHigh extends VoFarmStrategy {
 
     private executeBuyLowSellHigh() {
 
-        const ratherCloseOperand = 0
-
         for (const positionInsightsEntry of this.positionInsights) {
 
             const side = (positionInsightsEntry.direction === EDirection.LONG) ? 'Buy' : 'Sell'
@@ -106,13 +114,13 @@ export class BuyLowSellHigh extends VoFarmStrategy {
             // console.log(JSON.stringify(position))
 
             let enhancePositionTrigger = Number(positionInsightsEntry.lowerBand[positionInsightsEntry.lowerBand.length - 2].toFixed(2))
-            const date = new Date()
-            if ((date.getDay() === 0 && date.getHours() > 17) || date.getDay() === 1 && date.getHours() < 17) {
-                console.log("we're in a pretty bullish state of mind :)")
-                enhancePositionTrigger = Number(positionInsightsEntry.sma[positionInsightsEntry.lowerBand.length - 2].toFixed(2))
-            }
+            let reducePositionTrigger = Number(positionInsightsEntry.upperBand[positionInsightsEntry.upperBand.length - 2].toFixed(2))
 
-            const reducePositionTrigger = Number(positionInsightsEntry.upperBand[positionInsightsEntry.upperBand.length - 2].toFixed(2)) - ratherCloseOperand
+            if (this.bearishBullishIndicator === 1) {
+                enhancePositionTrigger = Number(positionInsightsEntry.sma[positionInsightsEntry.lowerBand.length - 2].toFixed(2))
+            } else if (this.bearishBullishIndicator === -1) {
+                reducePositionTrigger = Number(positionInsightsEntry.sma[positionInsightsEntry.upperBand.length - 2].toFixed(2))
+            }
 
             console.log(`${position.data.size} ${positionInsightsEntry.tradingPair} (${Number(position.data.position_value.toFixed(0))}) ${positionInsightsEntry.direction} ${pnl} ${enhancePositionTrigger} ${reducePositionTrigger} ${positionMarginInPercent}`)
 
