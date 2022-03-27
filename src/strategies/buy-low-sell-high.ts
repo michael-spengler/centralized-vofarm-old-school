@@ -39,7 +39,7 @@ export class BuyLowSellHigh extends VoFarmStrategy {
 
         this.enrichPortfolioInsights()
 
-        if (this.positionInsights[0].sma.length === this.historyLength || this.positionInsights[0].sma.length === 3) {
+        if (this.positionInsights[0].sma.length === this.historyLength) {
             this.executeBuyLowSellHigh()
         } else {
             console.log(this.positionInsights[0].sma.length)
