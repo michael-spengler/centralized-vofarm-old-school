@@ -20,7 +20,6 @@ export interface IPositionInsights {
 export enum EOpinionatedMode {
     bearish = -1,
     bullish = -1,
-    calmingDown = 0.5,
     relaxed = 0
 }
 
@@ -31,7 +30,6 @@ export class BuyLowSellHigh extends VoFarmStrategy {
     protected spreadFactor = 0
     protected minPNL = 0
     protected bearishBullishIndicator = 0
-    protected atLeastOnePositionIsExtremelyOpinionated = false
 
     public constructor(logger: VFLogger) {
         super(logger)
@@ -55,14 +53,11 @@ export class BuyLowSellHigh extends VoFarmStrategy {
         } else if ((date.getDay() === 5 && date.getHours() > 17) || date.getDay() === 6 || date.getDay() === 0 && date.getHours() < 16) {
             console.log("we're in a pretty bearish state of mind :) - reducing early")
             this.bearishBullishIndicator = EOpinionatedMode.bearish
-        } else if ((this.bearishBullishIndicator === EOpinionatedMode.bullish || this.bearishBullishIndicator === EOpinionatedMode.bearish) ||
-            this.atLeastOnePositionIsExtremelyOpinionated) {
-            this.bearishBullishIndicator = EOpinionatedMode.calmingDown
         } else {
             this.bearishBullishIndicator = EOpinionatedMode.relaxed
         }
-        if (this.positionInsights[0].sma.length === this.historyLength) {
-            // if (this.positionInsights[0].sma.length > 2) {
+        // if (this.positionInsights[0].sma.length === this.historyLength) {
+        if (this.positionInsights[0].sma.length > 2) {
             this.executeBuyLowSellHigh()
         } else {
             console.log(this.positionInsights[0].sma.length)
@@ -71,7 +66,6 @@ export class BuyLowSellHigh extends VoFarmStrategy {
         this.tidyUpPortfolio()
 
 
-        this.atLeastOnePositionIsExtremelyOpinionated = false
 
         return this.currentInvestmentAdvices
 
@@ -154,25 +148,17 @@ export class BuyLowSellHigh extends VoFarmStrategy {
                 enhancePositionTrigger = Number(positionInsightsEntry.sma[positionInsightsEntry.lowerBand.length - 2].toFixed(2))
             } else if (this.bearishBullishIndicator === EOpinionatedMode.bearish) {
                 reducePositionTrigger = Number(positionInsightsEntry.sma[positionInsightsEntry.upperBand.length - 2].toFixed(2))
-            } else if (this.bearishBullishIndicator === EOpinionatedMode.calmingDown) {
-                if (percentageOfEquity > positionInsightsEntry.targetPercentageOfEquity && pnl > 24 && position.data.size > positionInsightsEntry.tradingUnit) {
-                    this.reducePosition(positionInsightsEntry)
-                }
             }
 
-            if (percentageOfEquity > positionInsightsEntry.targetPercentageOfEquity && pnl > 24) {
-                this.atLeastOnePositionIsExtremelyOpinionated = true
-            }
+            console.log(`${position.data.size} ${positionInsightsEntry.tradingPair} (${Number(position.data.position_value.toFixed(0))}) ${positionInsightsEntry.direction} ${pnl} ${enhancePositionTrigger} ${reducePositionTrigger} ${percentageOfEquity} ${this.bearishBullishIndicator}`)
 
-            console.log(`${position.data.size} ${positionInsightsEntry.tradingPair} (${Number(position.data.position_value.toFixed(0))}) ${positionInsightsEntry.direction} ${pnl} ${enhancePositionTrigger} ${reducePositionTrigger} ${percentageOfEquity} ${this.bearishBullishIndicator} ${this.atLeastOnePositionIsExtremelyOpinionated}`)
-
-            if (this.liquidityLevel > 0.5) {
+            if (this.liquidityLevel > 7) {
                 if (pnl < enhancePositionTrigger) {
                     this.enhancePosition(positionInsightsEntry)
                 }
             }
 
-            if (pnl > reducePositionTrigger && (pnl > this.minPNL || this.liquidityLevel === 0) && percentageOfEquity > positionInsightsEntry.targetPercentageOfEquity) {
+            if (((pnl > reducePositionTrigger && pnl > this.minPNL) || this.liquidityLevel === 0) && position.data.size > positionInsightsEntry.tradingUnit) {
                 this.reducePosition(positionInsightsEntry)
             }
 
