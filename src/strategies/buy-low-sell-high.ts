@@ -136,12 +136,12 @@ export class BuyLowSellHigh extends VoFarmStrategy {
             } else if (this.bearishBullishIndicator === EOpinionatedMode.bearish) {
                 reducePositionTrigger = Number(positionInsightsEntry.sma[positionInsightsEntry.upperBand.length - 2].toFixed(2))
             } else if (this.bearishBullishIndicator === EOpinionatedMode.calmingDown) {
-                if (positionMarginInPercent > positionInsightsEntry.targetPositionMargin && pnl > 24) {
+                if (positionMarginInPercent > positionInsightsEntry.targetPositionMargin && pnl > 24 && position.data.size > positionInsightsEntry.tradingUnit) {
                     this.reducePosition(positionInsightsEntry)
                 }
             }
 
-            if (positionMarginInPercent > positionInsightsEntry.targetPositionMargin) {
+            if (positionMarginInPercent > positionInsightsEntry.targetPositionMargin && pnl > 24) {
                 this.atLeastOnePositionIsExtremelyOpinionated = true
             }
 
