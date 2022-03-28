@@ -43,6 +43,7 @@ export class BuyLowSellHigh extends VoFarmStrategy {
     public async getInvestmentAdvices(input: any): Promise<InvestmentAdvice[]> {
 
         this.currentInvestmentAdvices = []
+        this.atLeastOnePositionIsExtremelyOpinionated = false
 
         await this.collectFundamentals(input.exchangeConnector)
 
@@ -116,8 +117,6 @@ export class BuyLowSellHigh extends VoFarmStrategy {
 
     private executeBuyLowSellHigh() {
 
-        this.atLeastOnePositionIsExtremelyOpinionated = false
-
         for (const positionInsightsEntry of this.positionInsights) {
 
             const side = (positionInsightsEntry.direction === EDirection.LONG) ? 'Buy' : 'Sell'
@@ -145,7 +144,7 @@ export class BuyLowSellHigh extends VoFarmStrategy {
                 this.atLeastOnePositionIsExtremelyOpinionated = true
             }
 
-            console.log(`${position.data.size} ${positionInsightsEntry.tradingPair} (${Number(position.data.position_value.toFixed(0))}) ${positionInsightsEntry.direction} ${pnl} ${enhancePositionTrigger} ${reducePositionTrigger} ${positionMarginInPercent} ${this.bearishBullishIndicator}`)
+            console.log(`${position.data.size} ${positionInsightsEntry.tradingPair} (${Number(position.data.position_value.toFixed(0))}) ${positionInsightsEntry.direction} ${pnl} ${enhancePositionTrigger} ${reducePositionTrigger} ${positionMarginInPercent} ${this.bearishBullishIndicator} ${this.atLeastOnePositionIsExtremelyOpinionated}`)
 
             if (this.liquidityLevel > 0.5) {
                 if (pnl < enhancePositionTrigger) {
