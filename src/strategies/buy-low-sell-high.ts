@@ -50,7 +50,7 @@ export class BuyLowSellHigh extends VoFarmStrategy {
         this.enrichPortfolioInsights()
 
         const date = new Date()
-        if ((date.getDay() === 0 && date.getHours() > 17) || date.getDay() === 1 && date.getHours() < 13) {
+        if ((date.getDay() === 0 && date.getHours() > 17) || date.getDay() === 1 && date.getHours() < 14) {
             console.log("we're in a pretty bullish state of mind :) - enhancing early")
             this.bearishBullishIndicator = EOpinionatedMode.bullish
         } else if ((date.getDay() === 5 && date.getHours() > 17) || date.getDay() === 6 || date.getDay() === 0 && date.getHours() < 16) {
@@ -70,6 +70,15 @@ export class BuyLowSellHigh extends VoFarmStrategy {
             console.log(this.positionInsights[0].sma.length)
         }
 
+        this.tidyUpPortfolio()
+
+
+        return this.currentInvestmentAdvices
+
+    }
+
+    private tidyUpPortfolio() {
+
         for (const p of this.fundamentals.positions) {
             if (p.data.side === 'Sell') {
                 this.addInvestmentAdvice(Action.REDUCESHORT, p.data.size, p.data.symbol, 'inflation of fiat money suggests not to short crypto')
@@ -87,11 +96,7 @@ export class BuyLowSellHigh extends VoFarmStrategy {
 
             }
         }
-
-        return this.currentInvestmentAdvices
-
     }
-
     private enrichPortfolioInsights() {
 
         if (this.liquidityLevel === 0) {
