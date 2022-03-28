@@ -28,7 +28,7 @@ export const initialPositionInsights = [
         lowerBand: [],
         upperBand: [],
         tradingUnit: 0.001,
-        targetPositionMargin: 0.01,
+        targetPositionMargin: 2,
     }, {
         tradingPair: 'XMRUSDT',
         direction: EDirection.LONG,
@@ -37,7 +37,7 @@ export const initialPositionInsights = [
         lowerBand: [],
         upperBand: [],
         tradingUnit: 0.1,
-        targetPositionMargin: 1,
+        targetPositionMargin: 2,
     }, {
         tradingPair: 'ADAUSDT',
         direction: EDirection.LONG,
@@ -46,7 +46,7 @@ export const initialPositionInsights = [
         lowerBand: [],
         upperBand: [],
         tradingUnit: 10,
-        targetPositionMargin: 20,
+        targetPositionMargin: 2,
     }, {
         tradingPair: 'SOLUSDT',
         direction: EDirection.LONG,
@@ -75,7 +75,7 @@ export const initialPositionInsights = [
         lowerBand: [],
         upperBand: [],
         tradingUnit: 0.01,
-        targetPositionMargin: 0.1,
+        targetPositionMargin: 2,
     }, {
         tradingPair: 'LINKUSDT',
         direction: EDirection.LONG,
@@ -84,7 +84,7 @@ export const initialPositionInsights = [
         lowerBand: [],
         upperBand: [],
         tradingUnit: 1,
-        targetPositionMargin: 1,
+        targetPositionMargin: 2,
     }, {
         tradingPair: 'UNIUSDT',
         direction: EDirection.LONG,
@@ -93,7 +93,7 @@ export const initialPositionInsights = [
         lowerBand: [],
         upperBand: [],
         tradingUnit: 1,
-        targetPositionMargin: 1,
+        targetPositionMargin: 2,
     }, {
         tradingPair: 'XRPUSDT',
         direction: EDirection.LONG,
@@ -102,7 +102,7 @@ export const initialPositionInsights = [
         lowerBand: [],
         upperBand: [],
         tradingUnit: 1,
-        targetPositionMargin: 10,
+        targetPositionMargin: 2,
     }, {
         tradingPair: 'LUNAUSDT',
         direction: EDirection.LONG,
@@ -111,7 +111,7 @@ export const initialPositionInsights = [
         lowerBand: [],
         upperBand: [],
         tradingUnit: 1,
-        targetPositionMargin: 1,
+        targetPositionMargin: 2,
     }, {
         tradingPair: 'AVAXUSDT',
         direction: EDirection.LONG,
@@ -120,7 +120,7 @@ export const initialPositionInsights = [
         lowerBand: [],
         upperBand: [],
         tradingUnit: 0.1,
-        targetPositionMargin: 1,
+        targetPositionMargin: 2,
 
     }, {
         tradingPair: 'DOGEUSDT',
@@ -149,7 +149,7 @@ export const initialPositionInsights = [
         lowerBand: [],
         upperBand: [],
         tradingUnit: 100,
-        targetPositionMargin: 200,
+        targetPositionMargin: 2,
     }, {
         tradingPair: 'CHRUSDT',
         direction: EDirection.LONG,
@@ -158,7 +158,7 @@ export const initialPositionInsights = [
         lowerBand: [],
         upperBand: [],
         tradingUnit: 10,
-        targetPositionMargin: 20,
+        targetPositionMargin: 2,
     }, {
         tradingPair: 'ATOMUSDT',
         direction: EDirection.LONG,
@@ -167,7 +167,7 @@ export const initialPositionInsights = [
         lowerBand: [],
         upperBand: [],
         tradingUnit: 1,
-        targetPositionMargin: 1,
+        targetPositionMargin: 2,
     }, {
         tradingPair: 'LTCUSDT',
         direction: EDirection.LONG,
@@ -176,7 +176,7 @@ export const initialPositionInsights = [
         lowerBand: [],
         upperBand: [],
         tradingUnit: 0.1,
-        targetPositionMargin: 1,
+        targetPositionMargin: 2,
     }, {
         tradingPair: 'BCHUSDT',
         direction: EDirection.LONG,
@@ -185,7 +185,7 @@ export const initialPositionInsights = [
         lowerBand: [],
         upperBand: [],
         tradingUnit: 0.1,
-        targetPositionMargin: 1,
+        targetPositionMargin: 2,
     }, {
         tradingPair: 'XLMUSDT',
         direction: EDirection.LONG,
@@ -194,7 +194,7 @@ export const initialPositionInsights = [
         lowerBand: [],
         upperBand: [],
         tradingUnit: 10,
-        targetPositionMargin: 10,
+        targetPositionMargin: 2,
     }, {
         tradingPair: 'ICPUSDT',
         direction: EDirection.LONG,
@@ -203,7 +203,7 @@ export const initialPositionInsights = [
         lowerBand: [],
         upperBand: [],
         tradingUnit: 1,
-        targetPositionMargin: 1,
+        targetPositionMargin: 2,
     }, {
         tradingPair: 'SANDUSDT',
         direction: EDirection.LONG,
@@ -212,6 +212,6 @@ export const initialPositionInsights = [
         lowerBand: [],
         upperBand: [],
         tradingUnit: 1,
-        targetPositionMargin: 1,
+        targetPositionMargin: 2,
     }
 ]

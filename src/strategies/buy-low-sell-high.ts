@@ -17,6 +17,13 @@ export interface IPositionInsights {
     targetPositionMargin: number
 }
 
+export enum EOpinionatedMode {
+    bearish = -1,
+    bullish = -1,
+    calmingDown = 0.5,
+    relaxed = 0
+}
+
 export class BuyLowSellHigh extends VoFarmStrategy {
 
     protected historyLength = 50
@@ -24,6 +31,7 @@ export class BuyLowSellHigh extends VoFarmStrategy {
     protected spreadFactor = 0
     protected minPNL = 0
     protected bearishBullishIndicator = 0
+    protected atLeastOnePositionIsExtremelyOpinionated = false
 
     public constructor(logger: VFLogger) {
         super(logger)
@@ -43,12 +51,15 @@ export class BuyLowSellHigh extends VoFarmStrategy {
         const date = new Date()
         if ((date.getDay() === 0 && date.getHours() > 17) || date.getDay() === 1 && date.getHours() < 11) {
             console.log("we're in a pretty bullish state of mind :) - enhancing early")
-            this.bearishBullishIndicator = 1
+            this.bearishBullishIndicator = EOpinionatedMode.bullish
         } else if ((date.getDay() === 5 && date.getHours() > 17) || date.getDay() === 6 || date.getDay() === 0 && date.getHours() < 16) {
             console.log("we're in a pretty bearish state of mind :) - reducing early")
-            this.bearishBullishIndicator = -1
+            this.bearishBullishIndicator = EOpinionatedMode.bearish
+        } else if ((this.bearishBullishIndicator === EOpinionatedMode.bullish || this.bearishBullishIndicator === EOpinionatedMode.bearish) ||
+            this.atLeastOnePositionIsExtremelyOpinionated) {
+            this.bearishBullishIndicator = EOpinionatedMode.calmingDown
         } else {
-            this.bearishBullishIndicator = 0
+            this.bearishBullishIndicator = EOpinionatedMode.relaxed
         }
 
         if (this.positionInsights[0].sma.length === this.historyLength) {
@@ -105,6 +116,8 @@ export class BuyLowSellHigh extends VoFarmStrategy {
 
     private executeBuyLowSellHigh() {
 
+        this.atLeastOnePositionIsExtremelyOpinionated = false
+
         for (const positionInsightsEntry of this.positionInsights) {
 
             const side = (positionInsightsEntry.direction === EDirection.LONG) ? 'Buy' : 'Sell'
@@ -118,13 +131,21 @@ export class BuyLowSellHigh extends VoFarmStrategy {
             let enhancePositionTrigger = Number(positionInsightsEntry.lowerBand[positionInsightsEntry.lowerBand.length - 2].toFixed(2))
             let reducePositionTrigger = Number(positionInsightsEntry.upperBand[positionInsightsEntry.upperBand.length - 2].toFixed(2))
 
-            if (this.bearishBullishIndicator === 1) {
+            if (this.bearishBullishIndicator === EOpinionatedMode.bullish) {
                 enhancePositionTrigger = Number(positionInsightsEntry.sma[positionInsightsEntry.lowerBand.length - 2].toFixed(2))
-            } else if (this.bearishBullishIndicator === -1) {
+            } else if (this.bearishBullishIndicator === EOpinionatedMode.bearish) {
                 reducePositionTrigger = Number(positionInsightsEntry.sma[positionInsightsEntry.upperBand.length - 2].toFixed(2))
+            } else if (this.bearishBullishIndicator === EOpinionatedMode.calmingDown) {
+                if (positionMarginInPercent > positionInsightsEntry.targetPositionMargin && pnl > 24) {
+                    this.reducePosition(positionInsightsEntry)
+                }
             }
 
-            console.log(`${position.data.size} ${positionInsightsEntry.tradingPair} (${Number(position.data.position_value.toFixed(0))}) ${positionInsightsEntry.direction} ${pnl} ${enhancePositionTrigger} ${reducePositionTrigger} ${positionMarginInPercent}`)
+            if (positionMarginInPercent > positionInsightsEntry.targetPositionMargin) {
+                this.atLeastOnePositionIsExtremelyOpinionated = true
+            }
+
+            console.log(`${position.data.size} ${positionInsightsEntry.tradingPair} (${Number(position.data.position_value.toFixed(0))}) ${positionInsightsEntry.direction} ${pnl} ${enhancePositionTrigger} ${reducePositionTrigger} ${positionMarginInPercent} ${this.bearishBullishIndicator}`)
 
             if (this.liquidityLevel > 0.5) {
                 if (pnl < enhancePositionTrigger) {
