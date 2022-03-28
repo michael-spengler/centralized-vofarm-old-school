@@ -43,7 +43,6 @@ export class BuyLowSellHigh extends VoFarmStrategy {
     public async getInvestmentAdvices(input: any): Promise<InvestmentAdvice[]> {
 
         this.currentInvestmentAdvices = []
-        this.atLeastOnePositionIsExtremelyOpinionated = false
 
         await this.collectFundamentals(input.exchangeConnector)
 
@@ -62,7 +61,6 @@ export class BuyLowSellHigh extends VoFarmStrategy {
         } else {
             this.bearishBullishIndicator = EOpinionatedMode.relaxed
         }
-
         if (this.positionInsights[0].sma.length === this.historyLength) {
             // if (this.positionInsights[0].sma.length > 2) {
             this.executeBuyLowSellHigh()
@@ -72,6 +70,8 @@ export class BuyLowSellHigh extends VoFarmStrategy {
 
         this.tidyUpPortfolio()
 
+
+        this.atLeastOnePositionIsExtremelyOpinionated = false
 
         return this.currentInvestmentAdvices
 
