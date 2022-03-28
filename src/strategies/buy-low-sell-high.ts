@@ -14,7 +14,7 @@ export interface IPositionInsights {
     lowerBand: number[],
     upperBand: number[],
     tradingUnit: number,
-    targetPositionMargin: number
+    targetPercentageOfEquity: number
 }
 
 export enum EOpinionatedMode {
@@ -63,7 +63,8 @@ export class BuyLowSellHigh extends VoFarmStrategy {
             this.bearishBullishIndicator = EOpinionatedMode.relaxed
         }
 
-        if (this.positionInsights[0].sma.length === this.historyLength) {
+        // if (this.positionInsights[0].sma.length === this.historyLength) {
+        if (this.positionInsights[0].sma.length > 2) {
             this.executeBuyLowSellHigh()
         } else {
             console.log(this.positionInsights[0].sma.length)
@@ -124,8 +125,9 @@ export class BuyLowSellHigh extends VoFarmStrategy {
             if (position === undefined) continue
             const pnl = positionInsightsEntry.pnlHistory[positionInsightsEntry.pnlHistory.length - 1]
 
-            const positionMarginInPercent = Number(((position.data.position_margin * 100) / this.fundamentals.accountInfo.result.USDT.equity).toFixed(2))
-            // console.log(JSON.stringify(position))
+            const baseValue = position.data.position_value / position.data.leverage
+
+            const percentageOfEquity = Number((baseValue * 100 / this.fundamentals.accountInfo.result.USDT.equity).toFixed(2))
 
             let enhancePositionTrigger = Number(positionInsightsEntry.lowerBand[positionInsightsEntry.lowerBand.length - 2].toFixed(2))
             let reducePositionTrigger = Number(positionInsightsEntry.upperBand[positionInsightsEntry.upperBand.length - 2].toFixed(2))
@@ -135,16 +137,16 @@ export class BuyLowSellHigh extends VoFarmStrategy {
             } else if (this.bearishBullishIndicator === EOpinionatedMode.bearish) {
                 reducePositionTrigger = Number(positionInsightsEntry.sma[positionInsightsEntry.upperBand.length - 2].toFixed(2))
             } else if (this.bearishBullishIndicator === EOpinionatedMode.calmingDown) {
-                if (positionMarginInPercent > positionInsightsEntry.targetPositionMargin && pnl > 24 && position.data.size > positionInsightsEntry.tradingUnit) {
+                if (percentageOfEquity > positionInsightsEntry.targetPercentageOfEquity && pnl > 24 && position.data.size > positionInsightsEntry.tradingUnit) {
                     this.reducePosition(positionInsightsEntry)
                 }
             }
 
-            if (positionMarginInPercent > positionInsightsEntry.targetPositionMargin && pnl > 24) {
+            if (percentageOfEquity > positionInsightsEntry.targetPercentageOfEquity && pnl > 24) {
                 this.atLeastOnePositionIsExtremelyOpinionated = true
             }
 
-            console.log(`${position.data.size} ${positionInsightsEntry.tradingPair} (${Number(position.data.position_value.toFixed(0))}) ${positionInsightsEntry.direction} ${pnl} ${enhancePositionTrigger} ${reducePositionTrigger} ${positionMarginInPercent} ${this.bearishBullishIndicator} ${this.atLeastOnePositionIsExtremelyOpinionated}`)
+            console.log(`${position.data.size} ${positionInsightsEntry.tradingPair} (${Number(position.data.position_value.toFixed(0))}) ${positionInsightsEntry.direction} ${pnl} ${enhancePositionTrigger} ${reducePositionTrigger} ${percentageOfEquity} ${this.bearishBullishIndicator} ${this.atLeastOnePositionIsExtremelyOpinionated}`)
 
             if (this.liquidityLevel > 0.5) {
                 if (pnl < enhancePositionTrigger) {
@@ -152,7 +154,7 @@ export class BuyLowSellHigh extends VoFarmStrategy {
                 }
             }
 
-            if (pnl > reducePositionTrigger && (pnl > this.minPNL || this.liquidityLevel === 0) && positionMarginInPercent > positionInsightsEntry.targetPositionMargin) {
+            if (pnl > reducePositionTrigger && (pnl > this.minPNL || this.liquidityLevel === 0) && percentageOfEquity > positionInsightsEntry.targetPercentageOfEquity) {
                 this.reducePosition(positionInsightsEntry)
             }
 
