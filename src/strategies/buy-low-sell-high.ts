@@ -47,6 +47,8 @@ export class BuyLowSellHigh extends VoFarmStrategy {
         } else if ((date.getDay() === 5 && date.getHours() > 17) || date.getDay() === 6 || date.getDay() === 0 && date.getHours() < 16) {
             console.log("we're in a pretty bearish state of mind :) - reducing early")
             this.bearishBullishIndicator = -1
+        } else {
+            this.bearishBullishIndicator = 0
         }
 
         if (this.positionInsights[0].sma.length === this.historyLength) {
