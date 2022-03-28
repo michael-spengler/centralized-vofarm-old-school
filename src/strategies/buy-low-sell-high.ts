@@ -74,7 +74,20 @@ export class BuyLowSellHigh extends VoFarmStrategy {
             if (p.data.side === 'Sell') {
                 this.addInvestmentAdvice(Action.REDUCESHORT, p.data.size, p.data.symbol, 'inflation of fiat money suggests not to short crypto')
             }
+
+            const direction = (p.data.side === 'Buy') ? EDirection.LONG : EDirection.SHORT
+
+            const i = this.positionInsights.filter((e: IPositionInsights) => e.tradingPair === p.data.symbol && e.direction === direction)[0]
+            if (i === undefined) {
+                if (direction === EDirection.LONG) {
+                    this.addInvestmentAdvice(Action.REDUCELONG, p.data.size, p.data.symbol, 'tidy up')
+                } else {
+                    this.addInvestmentAdvice(Action.REDUCESHORT, p.data.size, p.data.symbol, 'tidy up')
+                }
+
+            }
         }
+
         return this.currentInvestmentAdvices
 
     }
