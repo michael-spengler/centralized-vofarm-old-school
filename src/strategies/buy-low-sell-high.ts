@@ -41,10 +41,10 @@ export class BuyLowSellHigh extends VoFarmStrategy {
         this.enrichPortfolioInsights()
 
         const date = new Date()
-        if ((date.getDay() === 0 && date.getHours() > 17) || date.getDay() === 1 && date.getHours() < 17) {
+        if ((date.getDay() === 0 && date.getHours() > 17) || date.getDay() === 1 && date.getHours() < 11) {
             console.log("we're in a pretty bullish state of mind :) - enhancing early")
             this.bearishBullishIndicator = 1
-        } else if ((date.getDay() === 5 && date.getHours() > 17) || date.getDay() === 6 || date.getDay() === 0 && date.getHours() < 17) {
+        } else if ((date.getDay() === 5 && date.getHours() > 17) || date.getDay() === 6 || date.getDay() === 0 && date.getHours() < 16) {
             console.log("we're in a pretty bearish state of mind :) - reducing early")
             this.bearishBullishIndicator = -1
         }
