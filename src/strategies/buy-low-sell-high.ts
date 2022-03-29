@@ -147,7 +147,7 @@ export class BuyLowSellHigh extends VoFarmStrategy {
             if (this.bearishBullishIndicator === EOpinionatedMode.bullish) {
                 enhancePositionTrigger = enhancePositionTrigger + 3
             } else if (this.bearishBullishIndicator === EOpinionatedMode.bearish) {
-                reducePositionTrigger = reducePositionTrigger - 3
+                reducePositionTrigger = Number(positionInsightsEntry.sma[positionInsightsEntry.upperBand.length - 2])
             }
 
             console.log(`${position.data.size} ${positionInsightsEntry.tradingPair} (${Number(position.data.position_value.toFixed(0))}) ${positionInsightsEntry.direction} ${pnl} ${enhancePositionTrigger} ${reducePositionTrigger} ${percentageOfEquity} ${this.bearishBullishIndicator}`)
