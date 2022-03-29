@@ -10,7 +10,7 @@ export const initialPositionInsights = [
         lowerBand: [],
         upperBand: [],
         tradingUnit: 10,
-        targetPercentageOfEquity: 30,
+        targetPercentageOfEquity: 20,
     }, {
         tradingPair: 'ETHUSDT',
         direction: EDirection.LONG,
@@ -19,7 +19,7 @@ export const initialPositionInsights = [
         lowerBand: [],
         upperBand: [],
         tradingUnit: 0.01,
-        targetPercentageOfEquity: 20,
+        targetPercentageOfEquity: 10,
     }, {
         tradingPair: 'BTCUSDT',
         direction: EDirection.LONG,
@@ -93,7 +93,7 @@ export const initialPositionInsights = [
         lowerBand: [],
         upperBand: [],
         tradingUnit: 1,
-        targetPercentageOfEquity: 2,
+        targetPercentageOfEquity: 5,
     }, {
         tradingPair: 'XRPUSDT',
         direction: EDirection.LONG,
