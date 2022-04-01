@@ -142,7 +142,7 @@ export class BuyLowSellHigh extends VoFarmStrategy {
             const percentageOfEquity = Number((baseValue * 100 / this.fundamentals.accountInfo.result.USDT.equity).toFixed(2))
 
             let enhancePositionTrigger = Number(positionInsightsEntry.lowerBand[positionInsightsEntry.lowerBand.length - 2].toFixed(2))
-            let reducePositionTrigger = Number(positionInsightsEntry.upperBand[positionInsightsEntry.upperBand.length - 2].toFixed(2))
+            let reducePositionTrigger = enhancePositionTrigger + 20
 
             if (this.bearishBullishIndicator === EOpinionatedMode.bullish) {
                 enhancePositionTrigger = enhancePositionTrigger + 3
