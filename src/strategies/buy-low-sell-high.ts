@@ -174,7 +174,7 @@ export class BuyLowSellHigh extends VoFarmStrategy {
                 }
             }
 
-            if ((pnl > reducePositionTrigger || this.liquidityLevel < 0.1) && position.data.size > positionInsightsEntry.tradingUnit && percentageOfEquity > positionInsightsEntry.targetPercentageOfEquity) {
+            if ((pnl > reducePositionTrigger || this.liquidityLevel < 3) && position.data.size > positionInsightsEntry.tradingUnit && percentageOfEquity > positionInsightsEntry.targetPercentageOfEquity) {
                 this.reducePosition(positionInsightsEntry)
             }
 
