@@ -1,7 +1,8 @@
+import { IPositionInsights } from "../interfaces/insights.ts";
 import { EDirection } from "./enums.ts";
 
 
-export const initialPositionInsights = [
+export const initialPositionInsights: IPositionInsights[] = [
     {
         tradingPair: 'ENSUSDT',
         direction: EDirection.LONG,
@@ -10,6 +11,7 @@ export const initialPositionInsights = [
         lowerBand: [],
         upperBand: [],
         tradingUnit: 10,
+        stopLoss: 1,
         targetPercentageOfEquity: 5,
     }, {
         tradingPair: 'ETHUSDT',
@@ -19,6 +21,7 @@ export const initialPositionInsights = [
         lowerBand: [],
         upperBand: [],
         tradingUnit: 0.01,
+        stopLoss: 0,
         targetPercentageOfEquity: 0,
     }, {
         tradingPair: 'BTCUSDT',
@@ -28,6 +31,7 @@ export const initialPositionInsights = [
         lowerBand: [],
         upperBand: [],
         tradingUnit: 0.001,
+        stopLoss: 0,
         targetPercentageOfEquity: 0,
     }, {
         tradingPair: 'XMRUSDT',
@@ -37,6 +41,7 @@ export const initialPositionInsights = [
         lowerBand: [],
         upperBand: [],
         tradingUnit: 0.1,
+        stopLoss: 0,
         targetPercentageOfEquity: 1,
     }, {
         tradingPair: 'ADAUSDT',
@@ -46,6 +51,7 @@ export const initialPositionInsights = [
         lowerBand: [],
         upperBand: [],
         tradingUnit: 10,
+        stopLoss: 0,
         targetPercentageOfEquity: 1,
     }, {
         tradingPair: 'SOLUSDT',
@@ -55,6 +61,7 @@ export const initialPositionInsights = [
         lowerBand: [],
         upperBand: [],
         tradingUnit: 0.1,
+        stopLoss: 0,
         targetPercentageOfEquity: 1,
 
     }, {
@@ -65,8 +72,8 @@ export const initialPositionInsights = [
         lowerBand: [],
         upperBand: [],
         tradingUnit: 0.1,
+        stopLoss: 0,
         targetPercentageOfEquity: 1,
-        maxSize: 50,
     }, {
         tradingPair: 'BNBUSDT',
         direction: EDirection.LONG,
@@ -75,6 +82,7 @@ export const initialPositionInsights = [
         lowerBand: [],
         upperBand: [],
         tradingUnit: 0.01,
+        stopLoss: 0,
         targetPercentageOfEquity: 1,
     }, {
         tradingPair: 'LINKUSDT',
@@ -84,6 +92,7 @@ export const initialPositionInsights = [
         lowerBand: [],
         upperBand: [],
         tradingUnit: 1,
+        stopLoss: 0,
         targetPercentageOfEquity: 1,
     }, {
         tradingPair: 'UNIUSDT',
@@ -93,6 +102,7 @@ export const initialPositionInsights = [
         lowerBand: [],
         upperBand: [],
         tradingUnit: 1,
+        stopLoss: 0,
         targetPercentageOfEquity: 1,
     }, {
         tradingPair: 'XRPUSDT',
@@ -102,6 +112,7 @@ export const initialPositionInsights = [
         lowerBand: [],
         upperBand: [],
         tradingUnit: 1,
+        stopLoss: 0,
         targetPercentageOfEquity: 0,
     }, {
         tradingPair: 'LUNAUSDT',
@@ -111,6 +122,7 @@ export const initialPositionInsights = [
         lowerBand: [],
         upperBand: [],
         tradingUnit: 1,
+        stopLoss: 0,
         targetPercentageOfEquity: 0,
     }, {
         tradingPair: 'AVAXUSDT',
@@ -120,6 +132,7 @@ export const initialPositionInsights = [
         lowerBand: [],
         upperBand: [],
         tradingUnit: 0.1,
+        stopLoss: 0,
         targetPercentageOfEquity: 0,
 
     }, {
@@ -130,6 +143,7 @@ export const initialPositionInsights = [
         lowerBand: [],
         upperBand: [],
         tradingUnit: 1,
+        stopLoss: 0,
         targetPercentageOfEquity: 0,
 
     }, {
@@ -140,6 +154,7 @@ export const initialPositionInsights = [
         lowerBand: [],
         upperBand: [],
         tradingUnit: 1,
+        stopLoss: 0,
         targetPercentageOfEquity: 0,
     }, {
         tradingPair: 'SHIB1000USDT',
@@ -149,6 +164,7 @@ export const initialPositionInsights = [
         lowerBand: [],
         upperBand: [],
         tradingUnit: 100,
+        stopLoss: 0,
         targetPercentageOfEquity: 0,
     }, {
         tradingPair: 'CHRUSDT',
@@ -158,6 +174,7 @@ export const initialPositionInsights = [
         lowerBand: [],
         upperBand: [],
         tradingUnit: 10,
+        stopLoss: 0,
         targetPercentageOfEquity: 0,
     }, {
         tradingPair: 'ATOMUSDT',
@@ -167,6 +184,7 @@ export const initialPositionInsights = [
         lowerBand: [],
         upperBand: [],
         tradingUnit: 1,
+        stopLoss: 0,
         targetPercentageOfEquity: 0,
     }, {
         tradingPair: 'LTCUSDT',
@@ -176,6 +194,7 @@ export const initialPositionInsights = [
         lowerBand: [],
         upperBand: [],
         tradingUnit: 0.1,
+        stopLoss: 0,
         targetPercentageOfEquity: 0,
     }, {
         tradingPair: 'BCHUSDT',
@@ -185,6 +204,7 @@ export const initialPositionInsights = [
         lowerBand: [],
         upperBand: [],
         tradingUnit: 0.1,
+        stopLoss: 0,
         targetPercentageOfEquity: 0,
     }, {
         tradingPair: 'XLMUSDT',
@@ -194,6 +214,7 @@ export const initialPositionInsights = [
         lowerBand: [],
         upperBand: [],
         tradingUnit: 10,
+        stopLoss: 0,
         targetPercentageOfEquity: 0,
     }, {
         tradingPair: 'ICPUSDT',
@@ -203,6 +224,7 @@ export const initialPositionInsights = [
         lowerBand: [],
         upperBand: [],
         tradingUnit: 1,
+        stopLoss: 0,
         targetPercentageOfEquity: 0,
     }, {
         tradingPair: 'SANDUSDT',
@@ -212,6 +234,7 @@ export const initialPositionInsights = [
         lowerBand: [],
         upperBand: [],
         tradingUnit: 1,
+        stopLoss: 0,
         targetPercentageOfEquity: 0,
     }
 ]

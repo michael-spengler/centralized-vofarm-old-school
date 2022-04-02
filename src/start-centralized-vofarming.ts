@@ -5,6 +5,7 @@ import { IVFLogger } from "./interfaces/logger.ts"
 import { VFLogger } from "./utilities/logger.ts"
 import { MartingaleReloaded } from "./strategies/martingale-reloaded.ts";
 import { BuyLowSellHigh } from "./strategies/buy-low-sell-high.ts";
+import { TrapCexes } from "./strategies/trap-cexes.ts";
 
 const apiKey = Deno.args[0]
 const apiSecret = Deno.args[1]
@@ -21,6 +22,7 @@ const registryLoggerServices = new Registry()
 
 registryVoFarmStrategies.register(BuyLowSellHigh)
 registryVoFarmStrategies.register(MartingaleReloaded)
+registryVoFarmStrategies.register(TrapCexes)
 registryExchangeConnectors.register(BybitConnector)
 registryLoggerServices.register(VFLogger)
 

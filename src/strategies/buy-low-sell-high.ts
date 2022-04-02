@@ -4,18 +4,9 @@ import { VFLogger } from "../utilities/logger.ts";
 import { VoFarmStrategy } from "./vofarm-strategy.ts";
 import { BollingerBandsService, IBollingerBands } from "https://deno.land/x/bollinger_bands@v0.2.0/mod.ts"
 import { initialPositionInsights } from "../constants/initial-position-insights.ts";
+import { IPositionInsights } from "../interfaces/insights.ts";
 
 
-export interface IPositionInsights {
-    tradingPair: string,
-    direction: EDirection,
-    pnlHistory: number[],
-    sma: number[],
-    lowerBand: number[],
-    upperBand: number[],
-    tradingUnit: number,
-    targetPercentageOfEquity: number
-}
 
 export enum EOpinionatedMode {
     bullish = 1,
@@ -45,6 +36,7 @@ export class BuyLowSellHigh extends VoFarmStrategy {
         await this.collectFundamentals(input.exchangeConnector)
 
         this.enrichPortfolioInsights()
+        // this.updateStopLosses(input)
 
         const date = new Date()
         if (((date.getDay() === 0 && date.getHours() > 17) || date.getDay() === 1 && date.getHours() < 18) && this.liquidityLevel > 11) {
@@ -70,6 +62,20 @@ export class BuyLowSellHigh extends VoFarmStrategy {
         return this.currentInvestmentAdvices
 
     }
+
+    // private async updateStopLosses(input: any) {
+    //     for (const positionInsightsEntry of this.positionInsights) {
+    //         const position = this.fundamentals.positions.filter((e: any) => e.data.symbol === positionInsightsEntry.tradingPair && e.data.side === 'Buy')[0]
+    //         const price = Number((position.data.position_value / position.data.size).toFixed(2))
+
+    //         if (positionInsightsEntry.stopLoss !== 0 && ((price - position.data.stop_loss) < 1)) {
+    //             const result = await input.exchangeConnector.setStopLoss(position.data.symbol, price - 2, 'Buy')
+
+    //             console.log(JSON.stringify(result))
+    //         }
+
+    //     }
+    // }
 
     private tidyUpPortfolio() {
 
@@ -168,7 +174,7 @@ export class BuyLowSellHigh extends VoFarmStrategy {
                 }
             }
 
-            if ((pnl > reducePositionTrigger || this.liquidityLevel < 3) && position.data.size > positionInsightsEntry.tradingUnit && percentageOfEquity > positionInsightsEntry.targetPercentageOfEquity) {
+            if ((pnl > reducePositionTrigger || this.liquidityLevel < 0.1) && position.data.size > positionInsightsEntry.tradingUnit && percentageOfEquity > positionInsightsEntry.targetPercentageOfEquity) {
                 this.reducePosition(positionInsightsEntry)
             }
 
