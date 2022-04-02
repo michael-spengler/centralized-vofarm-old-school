@@ -48,10 +48,10 @@ export class BuyLowSellHigh extends VoFarmStrategy {
 
         const date = new Date()
         if (((date.getDay() === 0 && date.getHours() > 17) || date.getDay() === 1 && date.getHours() < 18) && this.liquidityLevel > 11) {
-            console.log("we're in a pretty bullish state of mind :) - enhancing early")
+            console.log("we're in a pretty bullish state of mind :)")
             this.bearishBullishIndicator = EOpinionatedMode.bullish
         } else if ((date.getDay() === 5 && date.getHours() > 17) || date.getDay() === 6 || date.getDay() === 0 && date.getHours() < 16) {
-            console.log("we're in a pretty bearish state of mind :) - reducing early")
+            console.log("we're in a pretty bearish state of mind :)")
             this.bearishBullishIndicator = EOpinionatedMode.bearish
         } else {
             this.bearishBullishIndicator = EOpinionatedMode.relaxed
@@ -138,13 +138,13 @@ export class BuyLowSellHigh extends VoFarmStrategy {
             const side = (positionInsightsEntry.direction === EDirection.LONG) ? 'Buy' : 'Sell'
             const position = this.fundamentals.positions.filter((p: any) => p.data.side === side && p.data.symbol === positionInsightsEntry.tradingPair)[0]
             if (position === undefined) continue
-            const pnl = positionInsightsEntry.pnlHistory[positionInsightsEntry.pnlHistory.length - 1]
+            const pnl = Number(positionInsightsEntry.pnlHistory[positionInsightsEntry.pnlHistory.length - 1].toFixed(0))
 
             const baseValue = position.data.position_value / position.data.leverage
 
             const percentageOfEquity = Number((baseValue * 100 / this.fundamentals.accountInfo.result.USDT.equity).toFixed(2))
 
-            let enhancePositionTrigger = Number(positionInsightsEntry.lowerBand[positionInsightsEntry.lowerBand.length - 2].toFixed(2))
+            let enhancePositionTrigger = Number(positionInsightsEntry.lowerBand[positionInsightsEntry.lowerBand.length - 2].toFixed(0))
             let reducePositionTrigger = enhancePositionTrigger + 20
 
             const sma = Number(positionInsightsEntry.sma[positionInsightsEntry.sma.length - 2].toFixed(2))
@@ -160,7 +160,7 @@ export class BuyLowSellHigh extends VoFarmStrategy {
 
             const positionValue = Number(position.data.position_value.toFixed(0))
 
-            console.log(`${position.data.size} ${positionInsightsEntry.tradingPair} (${positionValue}) ${pnl} ${enhancePositionTrigger} ${reducePositionTrigger} ${percentageOfEquity}%`)
+            console.log(`${position.data.size} (${positionValue} - ${percentageOfEquity}%) ${positionInsightsEntry.tradingPair} ${pnl} ${enhancePositionTrigger} ${reducePositionTrigger}`)
 
             if (this.liquidityLevel > 7) {
                 if (pnl < enhancePositionTrigger) {
