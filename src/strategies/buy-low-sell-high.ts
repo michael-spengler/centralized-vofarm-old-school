@@ -56,8 +56,8 @@ export class BuyLowSellHigh extends VoFarmStrategy {
         } else {
             this.bearishBullishIndicator = EOpinionatedMode.relaxed
         }
-        // if (this.positionInsights[0].sma.length === this.historyLength) {
-        if (this.positionInsights[0].sma.length > 2) {
+        if (this.positionInsights[0].sma.length === this.historyLength) {
+            // if (this.positionInsights[0].sma.length > 2) {
             this.executeBuyLowSellHigh()
         } else {
             console.log(this.positionInsights[0].sma.length)
