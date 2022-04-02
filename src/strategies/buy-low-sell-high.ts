@@ -56,8 +56,8 @@ export class BuyLowSellHigh extends VoFarmStrategy {
         } else {
             this.bearishBullishIndicator = EOpinionatedMode.relaxed
         }
-        if (this.positionInsights[0].sma.length === this.historyLength) {
-            // if (this.positionInsights[0].sma.length > 2) {
+        // if (this.positionInsights[0].sma.length === this.historyLength) {
+        if (this.positionInsights[0].sma.length > 2) {
             this.executeBuyLowSellHigh()
         } else {
             console.log(this.positionInsights[0].sma.length)
@@ -100,6 +100,9 @@ export class BuyLowSellHigh extends VoFarmStrategy {
         }
 
         this.minPNL = 20 - this.spreadFactor
+        if (this.bearishBullishIndicator === EOpinionatedMode.bearish) this.minPNL = this.minPNL - 3
+        if (this.bearishBullishIndicator === EOpinionatedMode.bullish) this.minPNL = this.minPNL + 3
+
         console.log('spreadFactor:', this.spreadFactor, ' / minPNL:', this.minPNL)
 
         for (const positionInsightsEntry of this.positionInsights) {
@@ -142,15 +145,22 @@ export class BuyLowSellHigh extends VoFarmStrategy {
             const percentageOfEquity = Number((baseValue * 100 / this.fundamentals.accountInfo.result.USDT.equity).toFixed(2))
 
             let enhancePositionTrigger = Number(positionInsightsEntry.lowerBand[positionInsightsEntry.lowerBand.length - 2].toFixed(2))
-            let reducePositionTrigger = Number(positionInsightsEntry.upperBand[positionInsightsEntry.upperBand.length - 2].toFixed(2))
+            let reducePositionTrigger = enhancePositionTrigger + 20
 
-            if (this.bearishBullishIndicator === EOpinionatedMode.bullish) {
-                enhancePositionTrigger = enhancePositionTrigger + 3
-            } else if (this.bearishBullishIndicator === EOpinionatedMode.bearish) {
-                reducePositionTrigger = enhancePositionTrigger + 20
+            const sma = Number(positionInsightsEntry.sma[positionInsightsEntry.sma.length - 2].toFixed(2))
+
+            if (reducePositionTrigger < sma) {
+                reducePositionTrigger = Number(sma.toFixed(0))
             }
 
-            console.log(`${position.data.size} ${positionInsightsEntry.tradingPair} (${Number(position.data.position_value.toFixed(0))}) ${positionInsightsEntry.direction} ${pnl} ${enhancePositionTrigger} ${reducePositionTrigger} ${percentageOfEquity} ${this.bearishBullishIndicator}`)
+            if (reducePositionTrigger < this.minPNL) {
+                reducePositionTrigger = this.minPNL
+
+            }
+
+            const positionValue = Number(position.data.position_value.toFixed(0))
+
+            console.log(`${position.data.size} ${positionInsightsEntry.tradingPair} (${positionValue}) ${pnl} ${enhancePositionTrigger} ${reducePositionTrigger} ${percentageOfEquity}%`)
 
             if (this.liquidityLevel > 7) {
                 if (pnl < enhancePositionTrigger) {
@@ -158,7 +168,7 @@ export class BuyLowSellHigh extends VoFarmStrategy {
                 }
             }
 
-            if (((pnl > reducePositionTrigger && pnl > this.minPNL) || this.liquidityLevel === 0) && position.data.size > positionInsightsEntry.tradingUnit) {
+            if ((pnl > reducePositionTrigger || this.liquidityLevel < 3) && position.data.size > positionInsightsEntry.tradingUnit && percentageOfEquity > positionInsightsEntry.targetPercentageOfEquity) {
                 this.reducePosition(positionInsightsEntry)
             }
 
