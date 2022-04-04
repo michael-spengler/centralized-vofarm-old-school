@@ -28,9 +28,9 @@ export class TrapCexes extends VoFarmStrategy {
         console.log(JSON.stringify(ensPosition))
         const price = Number((ensPosition.data.position_value / ensPosition.data.size).toFixed(2))
         console.log(price)
-        const result = await input.exchangeConnector.setStopLoss(pair, price - 1, 'Buy')
+        // const result = await input.exchangeConnector.setStopLoss(pair, price - 1, 'Buy')
 
-        console.log(JSON.stringify(result))
+        // console.log(JSON.stringify(result))
 
 
 

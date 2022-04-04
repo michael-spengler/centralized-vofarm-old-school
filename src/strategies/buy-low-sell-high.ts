@@ -64,14 +64,33 @@ export class BuyLowSellHigh extends VoFarmStrategy {
     }
 
     // private async updateStopLosses(input: any) {
+
     //     for (const positionInsightsEntry of this.positionInsights) {
     //         const position = this.fundamentals.positions.filter((e: any) => e.data.symbol === positionInsightsEntry.tradingPair && e.data.side === 'Buy')[0]
     //         const price = Number((position.data.position_value / position.data.size).toFixed(2))
 
-    //         if (positionInsightsEntry.stopLoss !== 0 && ((price - position.data.stop_loss) < 1)) {
-    //             const result = await input.exchangeConnector.setStopLoss(position.data.symbol, price - 2, 'Buy')
+    //         if (positionInsightsEntry.stopLoss === 0) {
+    //             // chill
+    //         } else if (position.data.stop_loss === 0) {
+    //             const result = await input.exchangeConnector.setStopLoss(position.data.symbol, price - 1, 'Buy')
 
     //             console.log(JSON.stringify(result))
+
+    //         } else {
+    //             // update existing
+    //             if ((price - position.data.stop_loss) < 4) {
+    //                 let result = await input.exchangeConnector.getOrderList(position.data.symbol)
+    //                 console.log(JSON.stringify(result))
+
+    //                 // result = await input.exchangeConnector.cancelAllActiveOrders(position.data.symbol)
+    //                 // console.log(JSON.stringify(result))
+
+    //                 // result = await input.exchangeConnector.setStopLoss(position.data.symbol, price - 4, 'Buy')
+
+    //                 // console.log(JSON.stringify(result))
+    //                 console.log("update existing sl")
+
+    //             }
     //         }
 
     //     }
