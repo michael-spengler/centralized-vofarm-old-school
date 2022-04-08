@@ -193,7 +193,7 @@ export class BuyLowSellHigh extends VoFarmStrategy {
                 }
             }
 
-            if (positionInsightsEntry.tradingPair !== 'ENSUSDT' && ((pnl > reducePositionTrigger || this.liquidityLevel < 3) && position.data.size > positionInsightsEntry.tradingUnit && percentageOfEquity > positionInsightsEntry.targetPercentageOfEquity)) {
+            if ((positionInsightsEntry.tradingPair !== 'ENSUSDT' || this.liquidityLevel < 1) && ((pnl > reducePositionTrigger || this.liquidityLevel < 3) && position.data.size > positionInsightsEntry.tradingUnit && percentageOfEquity > positionInsightsEntry.targetPercentageOfEquity)) {
                 this.reducePosition(positionInsightsEntry)
             }
 
