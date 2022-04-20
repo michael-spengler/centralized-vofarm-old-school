@@ -99,15 +99,16 @@ export class BuyLowSellHigh extends VoFarmStrategy {
     private tidyUpPortfolio() {
 
         for (const p of this.fundamentals.positions) {
-            if (p.data.side === 'Sell') {
-                this.addInvestmentAdvice(Action.REDUCESHORT, p.data.size, p.data.symbol, 'inflation of fiat money suggests not to short crypto')
+
+            const pnl = FinancialCalculator.getPNLOfPositionInPercent(p)
+            if (p.data.side === 'Sell' && pnl > 10) {
+                this.addInvestmentAdvice(Action.REDUCESHORT, p.data.size, p.data.symbol, 'inflation of fiat money suggests not to short crypto too much')
             }
 
-            const direction = (p.data.side === 'Buy') ? EDirection.LONG : EDirection.SHORT
+            const i = this.positionInsights.filter((e: IPositionInsights) => e.tradingPair === p.data.symbol)[0]
 
-            const i = this.positionInsights.filter((e: IPositionInsights) => e.tradingPair === p.data.symbol && e.direction === direction)[0]
             if (i === undefined) {
-                if (direction === EDirection.LONG) {
+                if (p.data.side === 'Buy') {
                     this.addInvestmentAdvice(Action.REDUCELONG, p.data.size, p.data.symbol, 'tidy up')
                 } else {
                     this.addInvestmentAdvice(Action.REDUCESHORT, p.data.size, p.data.symbol, 'tidy up')
@@ -125,8 +126,8 @@ export class BuyLowSellHigh extends VoFarmStrategy {
         }
 
         this.minPNL = 20 - this.spreadFactor
-        if (this.bearishBullishIndicator === EOpinionatedMode.bearish) this.minPNL = this.minPNL - 3
-        if (this.bearishBullishIndicator === EOpinionatedMode.bullish) this.minPNL = this.minPNL + 3
+        if (this.bearishBullishIndicator === EOpinionatedMode.bearish) this.minPNL = this.minPNL - 1
+        if (this.bearishBullishIndicator === EOpinionatedMode.bullish) this.minPNL = this.minPNL + 1
 
         console.log('spreadFactor:', this.spreadFactor, ' / minPNL:', this.minPNL)
 
@@ -167,6 +168,7 @@ export class BuyLowSellHigh extends VoFarmStrategy {
 
             const baseValue = position.data.position_value / position.data.leverage
 
+            // console.log(this.fundamentals.accountInfo.result)
             const percentageOfEquity = Number((baseValue * 100 / this.fundamentals.accountInfo.result.USDT.equity).toFixed(2))
 
             let enhancePositionTrigger = Number(positionInsightsEntry.lowerBand[positionInsightsEntry.lowerBand.length - 2].toFixed(0))
@@ -188,13 +190,16 @@ export class BuyLowSellHigh extends VoFarmStrategy {
             console.log(`${position.data.size} (${positionValue} - ${percentageOfEquity}%) ${positionInsightsEntry.tradingPair} ${pnl} ${enhancePositionTrigger} ${reducePositionTrigger}`)
 
             if (this.liquidityLevel > 11 && percentageOfEquity < 10) {
-                if (pnl < enhancePositionTrigger || (pnl < -20 && percentageOfEquity < 2)) {
+                if (pnl < enhancePositionTrigger) {
                     this.enhancePosition(positionInsightsEntry)
                 }
             }
 
-            if ((positionInsightsEntry.tradingPair !== 'ENSUSDT' || this.liquidityLevel < 1) && ((pnl > reducePositionTrigger || this.liquidityLevel < 3) && position.data.size > positionInsightsEntry.tradingUnit && percentageOfEquity > positionInsightsEntry.targetPercentageOfEquity)) {
+            if ((pnl > reducePositionTrigger || this.liquidityLevel < 3) && position.data.size > positionInsightsEntry.tradingUnit && percentageOfEquity > positionInsightsEntry.targetPercentageOfEquity) {
                 this.reducePosition(positionInsightsEntry)
+                const inversePositionEntry = positionInsightsEntry
+                inversePositionEntry.direction = EDirection.SHORT
+                this.enhancePosition(inversePositionEntry)
             }
 
         }
