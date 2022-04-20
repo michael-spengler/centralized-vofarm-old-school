@@ -171,7 +171,7 @@ export class BuyLowSellHigh extends VoFarmStrategy {
             // console.log(this.fundamentals.accountInfo.result)
             const percentageOfEquity = Number((baseValue * 100 / this.fundamentals.accountInfo.result.USDT.equity).toFixed(2))
 
-            let enhancePositionTrigger = Number(positionInsightsEntry.lowerBand[positionInsightsEntry.lowerBand.length - 2].toFixed(0))
+            let enhancePositionTrigger = Number(positionInsightsEntry.lowerBand[positionInsightsEntry.lowerBand.length - 2].toFixed(0)) - 3
             let reducePositionTrigger = enhancePositionTrigger + 20
 
             const sma = Number(positionInsightsEntry.sma[positionInsightsEntry.sma.length - 2].toFixed(2))
@@ -189,13 +189,13 @@ export class BuyLowSellHigh extends VoFarmStrategy {
 
             console.log(`${position.data.size} (${positionValue} - ${percentageOfEquity}%) ${positionInsightsEntry.tradingPair} ${pnl} ${enhancePositionTrigger} ${reducePositionTrigger}`)
 
-            if (this.liquidityLevel > 11 && percentageOfEquity < 10) {
+            if (this.liquidityLevel > 14 && percentageOfEquity < 10) {
                 if (pnl < enhancePositionTrigger) {
                     this.enhancePosition(positionInsightsEntry)
                 }
             }
 
-            if ((pnl > reducePositionTrigger || this.liquidityLevel < 3) && position.data.size > positionInsightsEntry.tradingUnit && percentageOfEquity > positionInsightsEntry.targetPercentageOfEquity) {
+            if ((pnl > reducePositionTrigger || this.liquidityLevel < 2) && position.data.size > positionInsightsEntry.tradingUnit && percentageOfEquity > positionInsightsEntry.targetPercentageOfEquity) {
                 this.reducePosition(positionInsightsEntry)
                 const inversePositionEntry = positionInsightsEntry
                 inversePositionEntry.direction = EDirection.SHORT
