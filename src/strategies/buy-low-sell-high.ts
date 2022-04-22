@@ -161,9 +161,10 @@ export class BuyLowSellHigh extends VoFarmStrategy {
 
         for (const positionInsightsEntry of this.positionInsights) {
 
-            const side = (positionInsightsEntry.direction === EDirection.LONG) ? 'Buy' : 'Sell'
-            const position = this.fundamentals.positions.filter((p: any) => p.data.side === side && p.data.symbol === positionInsightsEntry.tradingPair)[0]
+            const position = this.fundamentals.positions.filter((p: any) => p.data.side === 'Buy' && p.data.symbol === positionInsightsEntry.tradingPair)[0]
+
             if (position === undefined) continue
+
             const pnl = Number(positionInsightsEntry.pnlHistory[positionInsightsEntry.pnlHistory.length - 1].toFixed(0))
 
             const baseValue = position.data.position_value / position.data.leverage
@@ -211,10 +212,11 @@ export class BuyLowSellHigh extends VoFarmStrategy {
 
     private enhancePosition(positionInsightsEntry: IPositionInsights) {
         const pnl = positionInsightsEntry.pnlHistory[positionInsightsEntry.pnlHistory.length - 1]
-        const text = `we enhance our ${positionInsightsEntry.tradingPair} ${positionInsightsEntry.direction} position at a pnl of ${pnl} to fuck manipulators`
         if (positionInsightsEntry.direction === EDirection.LONG) {
+            const text = `we enhance our ${positionInsightsEntry.tradingPair} ${positionInsightsEntry.direction} position at a pnl of ${pnl} to fuck manipulators`
             this.addInvestmentAdvice(Action.BUY, positionInsightsEntry.tradingUnit, positionInsightsEntry.tradingPair, text)
         } else {
+            const text = `we enhance our ${positionInsightsEntry.tradingPair} short position to hedge against manipulators`
             this.addInvestmentAdvice(Action.SELL, positionInsightsEntry.tradingUnit, positionInsightsEntry.tradingPair, text)
         }
     }

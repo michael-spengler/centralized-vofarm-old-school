@@ -246,5 +246,15 @@ export const initialPositionInsights: IPositionInsights[] = [
         tradingUnit: 1,
         stopLoss: 0,
         targetPercentageOfEquity: 0,
+    }, {
+        tradingPair: 'MANAUSDT',
+        direction: EDirection.LONG,
+        pnlHistory: [],
+        sma: [],
+        lowerBand: [],
+        upperBand: [],
+        tradingUnit: 10,
+        stopLoss: 0,
+        targetPercentageOfEquity: 0,
     }
 ]
