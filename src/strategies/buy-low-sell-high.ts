@@ -36,7 +36,6 @@ export class BuyLowSellHigh extends VoFarmStrategy {
         await this.collectFundamentals(input.exchangeConnector)
 
         this.enrichPortfolioInsights()
-        // this.updateStopLosses(input)
 
         const date = new Date()
         if (((date.getDay() === 0 && date.getHours() > 17) || date.getDay() === 1 && date.getHours() < 18) && this.liquidityLevel > 11) {
@@ -49,7 +48,6 @@ export class BuyLowSellHigh extends VoFarmStrategy {
             this.bearishBullishIndicator = EOpinionatedMode.relaxed
         }
         if (this.positionInsights[0].sma.length === this.historyLength) {
-            // if (this.positionInsights[0].sma.length > 2) {
             this.executeBuyLowSellHigh()
         } else {
             console.log(this.positionInsights[0].sma.length)
@@ -125,7 +123,7 @@ export class BuyLowSellHigh extends VoFarmStrategy {
     }
 
 
-    private executeBuyLowSellHigh() {
+    private executeBuyLowSellHigh(): void {
 
         for (const positionInsightsEntry of this.positionInsights) {
 
@@ -165,30 +163,15 @@ export class BuyLowSellHigh extends VoFarmStrategy {
                 }
             }
 
-            if ((pnl > reducePositionTrigger || this.liquidityLevel < 2) && position.data.size > positionInsightsEntry.tradingUnit && percentageOfEquity > positionInsightsEntry.targetPercentageOfEquity) {
-                this.reducePosition(positionInsightsEntry)
+            if ((pnl > reducePositionTrigger) && position.data.size > positionInsightsEntry.tradingUnit && percentageOfEquity > positionInsightsEntry.targetPercentageOfEquity) {
+                const text = `we reduce our ${positionInsightsEntry.tradingPair} ${positionInsightsEntry.direction} position at a pnl of ${pnl} to take some profits`
+                this.addInvestmentAdvice(Action.REDUCELONG, positionInsightsEntry.tradingUnit, positionInsightsEntry.tradingPair, text)
+
                 if (this.riskEquityRatio > 0) {
-                    const inversePositionEntry = positionInsightsEntry
-                    inversePositionEntry.direction = EDirection.SHORT
                     const text = `we enhance our ${positionInsightsEntry.tradingPair} short position to temp hedge our portfolio`
                     this.addInvestmentAdvice(Action.SELL, positionInsightsEntry.tradingUnit, positionInsightsEntry.tradingPair, text)
-
                 }
             }
-
-        }
-
-    }
-
-    private reducePosition(positionInsightsEntry: IPositionInsights) {
-        const pnl = positionInsightsEntry.pnlHistory[positionInsightsEntry.pnlHistory.length - 1]
-        const text = `we reduce our ${positionInsightsEntry.tradingPair} ${positionInsightsEntry.direction} position at a pnl of ${pnl} to take some profits`
-        if (positionInsightsEntry.direction === EDirection.LONG) {
-            this.addInvestmentAdvice(Action.REDUCELONG, positionInsightsEntry.tradingUnit, positionInsightsEntry.tradingPair, text)
-        } else {
-            this.addInvestmentAdvice(Action.REDUCESHORT, positionInsightsEntry.tradingUnit, positionInsightsEntry.tradingPair, text)
         }
     }
-
 }
-
