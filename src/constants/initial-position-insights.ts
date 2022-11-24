@@ -125,16 +125,6 @@ export const initialPositionInsights: IPositionInsights[] = [
         stopLoss: 0,
         targetPercentageOfEquity: 0,
     }, {
-        tradingPair: 'LUNAUSDT',
-        direction: EDirection.LONG,
-        pnlHistory: [],
-        sma: [],
-        lowerBand: [],
-        upperBand: [],
-        tradingUnit: 1,
-        stopLoss: 0,
-        targetPercentageOfEquity: 0,
-    }, {
         tradingPair: 'AVAXUSDT',
         direction: EDirection.LONG,
         pnlHistory: [],
