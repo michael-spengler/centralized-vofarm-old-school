@@ -66,7 +66,7 @@ export class BuyLowSellHigh extends VoFarmStrategy {
         for (const p of this.fundamentals.positions) {
 
             const pnl = FinancialCalculator.getPNLOfPositionInPercent(p)
-            if (p.data.side === 'Sell' && pnl > 10) {
+            if (p.data.side === 'Sell' && pnl > 50) {
                 this.addInvestmentAdvice(Action.REDUCESHORT, p.data.size, p.data.symbol, 'inflation of fiat money suggests not to short crypto too much')
             }
 
